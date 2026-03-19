@@ -61,8 +61,9 @@ public class AuthController {
 						request.getPassword())
 		);		
 		CustomUserDetails userDetails =(CustomUserDetails) authentication.getPrincipal();
+		System.out.println(userDetails.getAuthorities());
 		User user = userDetails.getUser();
-		String accessToken = jwtUtil.generateAccessToken(userDetails.getUsername());
+		String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRoles());
 		RefreshToken refreshToken = refreshTokenService.create(user);	
 			return new AuthResponse(accessToken, refreshToken.getToken());
 	}
@@ -82,7 +83,7 @@ public class AuthController {
 
 	    // Generate access token mới
 	    String newAccessToken =
-	            jwtUtil.generateAccessToken(user.getEmail());
+	            jwtUtil.generateAccessToken(user.getEmail(), user.getRoles());
 
 	    // Response
 	    return new AuthResponse(
