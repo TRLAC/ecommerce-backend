@@ -6,6 +6,7 @@ import com.ecommerce.dto.request.PlaceOrderRequest;
 import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.dto.response.PageResponse;
 import com.ecommerce.service.OrderService;
+import com.ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,32 +23,31 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<OrderResponse> placeOrder(
             @Valid @RequestBody PlaceOrderRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = extractUserId(userDetails);
-        OrderResponse response = orderService.placeOrder(userId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        Long userId = getCurrentUserId(userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.placeOrder(userId, request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> viewOrder(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = extractUserId(userDetails);
-        OrderResponse response = orderService.viewOrder(id, userId);
-        return ResponseEntity.ok(response);
+        Long userId = getCurrentUserId(userDetails);
+        return ResponseEntity.ok(orderService.viewOrder(id, userId));
     }
 
     @GetMapping("/my")
     public ResponseEntity<PageResponse<OrderResponse>> getMyOrders(
             OrderFilter filter,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = extractUserId(userDetails);
-        PageResponse<OrderResponse> response = orderService.getMyOrders(userId, filter);
-        return ResponseEntity.ok(response);
+        Long userId = getCurrentUserId(userDetails);
+        return ResponseEntity.ok(orderService.getMyOrders(userId, filter));
     }
 
     @PatchMapping("/{id}/cancel")
@@ -55,17 +55,13 @@ public class OrderController {
             @PathVariable Long id,
             @RequestBody(required = false) CancelOrderRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = extractUserId(userDetails);
+        Long userId = getCurrentUserId(userDetails);
         if (request == null) request = new CancelOrderRequest();
-        OrderResponse response = orderService.cancelOrder(id, userId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(orderService.cancelOrder(id, userId, request));
     }
 
-    private Long extractUserId(UserDetails userDetails) {
-        try {
-            return Long.parseLong(userDetails.getUsername());
-        } catch (NumberFormatException e) {
-            return 0L;
-        }
+    // JWT username = email → dùng UserService.findByEmail() để lấy id
+    private Long getCurrentUserId(UserDetails userDetails) {
+        return userService.findByEmail(userDetails.getUsername()).getId();
     }
 }

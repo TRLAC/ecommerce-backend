@@ -29,6 +29,6 @@ public class OrderFilter {
  
     private int page = 0;
     private int size = 10;
-    private String sortBy = "createAt";
+    private String sortBy = "createdAt";
     private String sortDir = "desc";
 }
