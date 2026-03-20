@@ -1,16 +1,16 @@
 package com.ecommerce.entity;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
+import com.ecommerce.enums.RefundStatus;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "refund")
+@Table(name = "REFUND")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,23 +23,25 @@ public class Refund {
     @Column(name = "refund_id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
+    @Column(name = "amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "reason", length = 1000)
     private String reason;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 50)
+    private RefundStatus status;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;
- 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
 
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt;
 }

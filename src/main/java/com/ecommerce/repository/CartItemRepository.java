@@ -17,7 +17,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
                                          @Param("userId") Long userId);
  
     // Tìm item đã tồn tại trong cart theo productId (để cộng dồn số lượng)
-    Optional<CartItem> findByCart_IdAndProduct_Id(Long cartId, Long productId);
+    Optional<CartItem> findByCart_IdAndProduct_ProductId(Long cartId, Long productId);
  
     // Kiểm tra ownership trước khi xóa
     @Query("SELECT COUNT(ci) > 0 FROM CartItem ci WHERE ci.id = :cartItemId AND ci.cart.user.id = :userId")

@@ -1,10 +1,10 @@
 package com.ecommerce.enums;
 
 public enum PaymentMethod {
-
-    COD,
-    VNPAY,
+	COD,
+    BANK_TRANSFER,
+    CREDIT_CARD,
+    E_WALLET,
     MOMO,
-    BANK_TRANSFER
-
+    VNPAY
 }

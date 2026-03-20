@@ -47,7 +47,7 @@ public class CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
 
-        cartItemRepository.findByCart_IdAndProduct_Id(cart.getId(), product.getProductId())
+        cartItemRepository.findByCart_IdAndProduct_ProductId(cart.getId(), product.getProductId())
                 .ifPresentOrElse(item -> {
                     int newQty = item.getQuantity() + request.getQuantity();
                     if (newQty > product.getStockQuantity())
