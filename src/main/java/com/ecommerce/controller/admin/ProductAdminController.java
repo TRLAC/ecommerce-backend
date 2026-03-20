@@ -58,7 +58,7 @@ public class ProductAdminController {
     	return ResponseEntity.ok().build();
     }
     
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/hide")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
     	 productService.hideProduct(id);
     	 return ResponseEntity.ok().build();

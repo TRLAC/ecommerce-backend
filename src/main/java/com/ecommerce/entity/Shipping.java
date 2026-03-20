@@ -1,5 +1,10 @@
 package com.ecommerce.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.ecommerce.enums.ShippingStatus;
 
 import jakarta.persistence.*;
@@ -31,5 +36,13 @@ public class Shipping {
 
     @Column(name = "tracking_code")
     private String trackingCode;
+    
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+ 
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }

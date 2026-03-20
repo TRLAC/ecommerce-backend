@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.ecommerce.enums.OrderStatus;
 
 import jakarta.persistence.Column;
@@ -48,8 +51,14 @@ public class Order {
     @Column(name = "status")
     private OrderStatus status;
 
-    @Column(name = "create_at")
-    private LocalDateTime createAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+ 
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;
