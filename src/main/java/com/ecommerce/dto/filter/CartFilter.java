@@ -1,7 +1,5 @@
 package com.ecommerce.dto.filter;
 
-import com.ecommerce.enums.CategoryStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,10 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryFilter {
-
-    private String keyword;           
-    private CategoryStatus status;   
-    private Long parentId;
-
+public class CartFilter {
+ 
+    private Long userId;
+    private Long productId;
+    private Integer minQuantity;
+    private Integer maxQuantity;
 }

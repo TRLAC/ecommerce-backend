@@ -6,23 +6,13 @@ import com.ecommerce.entity.Category;
 public class CategoryMapper {
 
     public static CategoryResponse toResponse(Category category) {
-    	 if (category == null) {
-             return null;
-         }
-
-        CategoryResponse res = new CategoryResponse();
-
-        res.setCategoryId(category.getCategoryId());
-        res.setName(category.getName());
-        
-
-        if (category.getParent() != null) {
-            res.setParentId(category.getParent().getCategoryId());
-        }
-        
-        res.setCreatedAt(category.getCreatedAt());
-        res.setUpdatedAt(category.getUpdatedAt());
-
-        return res;
+        CategoryResponse resp = new CategoryResponse();
+        resp.setCategoryId(category.getCategoryId());
+        resp.setName(category.getName());
+        resp.setParentId(category.getParent() != null ? category.getParent().getCategoryId() : null);
+        resp.setStatus(category.getStatus().name());
+        resp.setCreatedAt(category.getCreatedAt());
+        resp.setUpdatedAt(category.getUpdatedAt());
+        return resp;
     }
 }
