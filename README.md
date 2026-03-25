@@ -116,6 +116,7 @@ src/main/java/com/ecommerce
 ### 1. Clone project
 
 git clone https://github.com/TRLAC/ecommerce-backend.git
+
 cd ecommerce-backend
 
 ### 2. Configure database
