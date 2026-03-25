@@ -54,7 +54,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	public AuthResponse login(@Valid @RequestBody LoginRequest request) {		
+	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {		
 		Authentication authentication = authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(
 						request.getEmail(),
@@ -65,11 +65,13 @@ public class AuthController {
 		User user = userDetails.getUser();
 		String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRoles());
 		RefreshToken refreshToken = refreshTokenService.create(user);	
-			return new AuthResponse(accessToken, refreshToken.getToken());
+		 return ResponseEntity.ok(
+	                new AuthResponse(accessToken, refreshToken.getToken())
+	        );
 	}
 	
 	@PostMapping("/refresh")
-	public AuthResponse refresh(@RequestBody @Valid RefreshTokenRequest request) {
+	public ResponseEntity<AuthResponse> refresh(@RequestBody @Valid RefreshTokenRequest request) {
 
 	    // Verify refresh token
 	    RefreshToken oldToken =
@@ -86,10 +88,9 @@ public class AuthController {
 	            jwtUtil.generateAccessToken(user.getEmail(), user.getRoles());
 
 	    // Response
-	    return new AuthResponse(
-	            newAccessToken,
-	            newToken.getToken()
-	    );
+	    return ResponseEntity.ok(
+                new AuthResponse(newAccessToken, newToken.getToken())
+        );
 	}
 	
 	@PostMapping("/logout")
