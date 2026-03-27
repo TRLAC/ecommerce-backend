@@ -22,6 +22,8 @@ import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.ProductImageRepository;
 import com.ecommerce.repository.ProductRepository;
 
+import jakarta.transaction.Transactional;
+
 
 @Service
 public class ProductService {
@@ -57,6 +59,7 @@ public class ProductService {
 		return ProductMapper.toResponse(product);
 	}
 	
+	@Transactional
 	public ProductResponse createProduct(CreateProductRequest request) {
 		 
 		 Brand brand = brandRepository.findById(request.getBrandId())
@@ -82,6 +85,7 @@ public class ProductService {
 	     return ProductMapper.toResponse(saved);
 	}
 	
+	@Transactional
 	public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
 		
 		Product product = productRepository.findById(id)
@@ -129,6 +133,7 @@ public class ProductService {
 		return ProductMapper.toResponse(product);
 	}
 	
+	@Transactional
 	 public void uploadImages(Long productId, List<MultipartFile> files) {
 
 	        Product product = productRepository.findById(productId)
@@ -146,6 +151,7 @@ public class ProductService {
 	        }
 	 }
 
+	@Transactional
 	public void hideProduct(Long id) {
 		Product product = productRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Product not found"));

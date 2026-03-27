@@ -13,6 +13,8 @@ import com.ecommerce.entity.User;
 import com.ecommerce.repository.RoleRepository;
 import com.ecommerce.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserService {
 	private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class UserService {
 				.orElseThrow(() -> new RuntimeException("User not found")); 
 	}
 	
+	@Transactional
 	public User register(RegisterRequest request) {
 		
 		if(userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -58,6 +61,7 @@ public class UserService {
 		);
 	}
 	
+	@Transactional
 	public void updateProfile(String email, UpdateProfileRequest request) {
 
 	    User user = userRepository.findByEmail(email)

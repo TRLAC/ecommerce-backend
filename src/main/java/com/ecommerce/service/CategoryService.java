@@ -15,6 +15,8 @@ import com.ecommerce.enums.CategoryStatus;
 import com.ecommerce.mapper.CategoryMapper;
 import com.ecommerce.repository.CategoryRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CategoryService {
 
@@ -30,6 +32,7 @@ public class CategoryService {
         return CategoryMapper.toResponse(category);
     }
     
+    @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
 
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -56,6 +59,7 @@ public class CategoryService {
         return CategoryMapper.toResponse(saved);
     }
     
+    @Transactional
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -86,6 +90,7 @@ public class CategoryService {
         return CategoryMapper.toResponse(category);
     }
     
+    @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
