@@ -14,6 +14,4 @@ public class ConfirmPaymentRequest {
     @NotBlank(message = "Transaction ID is required")
     private String transactionId;
  
-    @NotNull(message = "Amount is required")
-    private BigDecimal amount;
 }

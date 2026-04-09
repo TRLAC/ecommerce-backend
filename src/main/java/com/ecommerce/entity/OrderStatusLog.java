@@ -2,6 +2,8 @@ package com.ecommerce.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.ecommerce.enums.OrderStatus;
 
 import jakarta.persistence.Column;
@@ -50,7 +52,7 @@ public class OrderStatusLog {
     @JoinColumn(name = "changed_by")
     private User changedBy;
 
-    @Column(name = "changed_at")
+    @CreationTimestamp
+    @Column(name = "changed_at", nullable = false, updatable = false)
     private LocalDateTime changedAt;
-
 }

@@ -28,13 +28,6 @@ public interface OrderService {
 
     OrderResponse manageOrder(Long orderId, Long adminId, UpdateOrderStatusRequest request);
 
-    // PAYMENT SYSTEM use cases
-    OrderResponse confirmPayment(ConfirmPaymentRequest request);
-
-    OrderResponse refundPayment(Long orderId, Long adminId, RefundRequest request);
-
-    // Shipping
-    OrderResponse updateShipping(Long orderId, Long adminId, UpdateShippingRequest request);
-
-	OrderResponse getOrderByIdForAdmin(Long orderId);
+    // SYSTEM (internal
+    void markAsPaid(Long orderId);
 }

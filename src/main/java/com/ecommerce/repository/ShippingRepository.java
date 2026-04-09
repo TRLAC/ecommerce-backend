@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface ShippingRepository extends JpaRepository<Shipping, Long> {
 
-    Optional<Shipping> findByOrder_Id(Long orderId);
+    Optional<Shipping> findByOrderId(Long orderId);
 
     Optional<Shipping> findByTrackingCode(String trackingCode);
 
-    boolean existsByOrder_IdAndShippingStatus(Long orderId, ShippingStatus shippingStatus);
+    boolean existsByOrderIdAndShippingStatus(Long orderId, ShippingStatus shippingStatus);
 }

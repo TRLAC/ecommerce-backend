@@ -14,6 +14,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -62,14 +63,14 @@ public class Order {
     private LocalDateTime updatedAt;
     
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
     
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private Payment payment;
     
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Shipping shipping;
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    private Shipping shipping;	
 
     @OneToMany(mappedBy = "order")
     private List<OrderStatusLog> statusLogs;

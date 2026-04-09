@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface RefundRepository extends JpaRepository<Refund, Long> {
 
-    Optional<Refund> findByPayment_Id(Long paymentId);
+    Optional<Refund> findByPaymentId(Long paymentId);
 
-    Optional<Refund> findByPayment_Order_Id(Long orderId);
+    Optional<Refund> findByPaymentOrderId(Long orderId);
 
-    boolean existsByPayment_Order_IdAndStatus(Long orderId, RefundStatus status);
+    boolean existsByPaymentOrderIdAndStatus(Long orderId, RefundStatus status);
 }
