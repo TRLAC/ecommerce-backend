@@ -1,4 +1,6 @@
-package com.ecommerce.service;
+	package com.ecommerce.service;
+
+import org.jspecify.annotations.Nullable;
 
 import com.ecommerce.dto.filter.OrderFilter;
 import com.ecommerce.dto.request.CancelOrderRequest;
@@ -29,5 +31,9 @@ public interface OrderService {
     OrderResponse manageOrder(Long orderId, Long adminId, UpdateOrderStatusRequest request);
 
     // SYSTEM (internal
+    void markAsRefunded(Long orderId);
     void markAsPaid(Long orderId);
+    void markAsShipped(Long orderId);
+
+    OrderResponse getOrderByIdForAdmin(Long id);
 }

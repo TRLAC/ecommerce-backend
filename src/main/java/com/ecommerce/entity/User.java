@@ -39,8 +39,8 @@ public class User {
 	    @Column(name = "user_id")
 	    private Long id;
 
-	    @Column(name = "full_name")
-	    private String fullName;
+	  	@Column(name = "full_name", nullable = false)
+	  	private String fullName;
 
 	    @Column(name = "email", nullable = false, unique = true)
 	    private String email;
@@ -48,7 +48,11 @@ public class User {
 	    @Column(name = "password_hash", nullable = false)
 	    private String passwordHash;
 
+	    @Column(name = "phone")
 	    private String phone;
+	    
+	    @Column(name = "avatar")
+	    private String avatar;
 
 	    @CreatedDate
 	    @Column(name = "created_at", nullable = false, updatable = false)
@@ -58,7 +62,7 @@ public class User {
 	    @Column(name = "updated_at", nullable = false)
 	    private LocalDateTime updatedAt;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "user_roles",
 			joinColumns = @JoinColumn(name = "user_id"),

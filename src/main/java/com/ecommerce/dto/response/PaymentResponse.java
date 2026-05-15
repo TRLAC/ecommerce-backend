@@ -17,9 +17,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class PaymentResponse {
 
     private Long paymentId;
+    private Long orderId;
     private PaymentMethod method;
     private BigDecimal amount;
     private PaymentStatus status;

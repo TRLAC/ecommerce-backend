@@ -3,12 +3,9 @@ package com.ecommerce.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.ecommerce.enums.ProductStatus;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,46 +30,40 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long productId;
 	
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "brand_id")
-    private Brand brand;
-    
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private BigDecimal price;
-
-    @Column(nullable = false)
-    private Integer stockQuantity;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ProductStatus status;
-    
-    private Integer ram;
-    private Integer storage;
-    private Integer battery;
-    private Double screenSize;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
- 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductImage> images;
-    
-    @OneToMany(mappedBy = "product")
-    private List<CartItem> cartItems;
-    
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "brand_id")
+	private Brand brand;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "category_id")
+	private Category category;
+	
+	@Column(nullable = false)
+	private String name;
+	
+	@Column(nullable = false)
+	private BigDecimal price;
+	
+	@Column(nullable = false)
+	private Integer stockQuantity;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ProductStatus status;
+	
+	private Integer ram;
+	private Integer storage;
+	private Integer battery;
+	private Double screenSize;
+	
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+	
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+	
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	private List<ProductImage> images;
 }
-
-

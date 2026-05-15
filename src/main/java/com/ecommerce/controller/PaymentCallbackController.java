@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.request.ConfirmPaymentRequest;
-import com.ecommerce.dto.response.ApiResponse;
-import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.service.OrderService;
+import com.ecommerce.dto.response.PaymentResponse;
+import com.ecommerce.service.PaymentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentCallbackController {
 
-    private final OrderService orderService;
+	private final PaymentService paymentService;
 
-    @PostMapping("/confirm")
-    public ResponseEntity<ApiResponse<OrderResponse>> confirmPayment(
-            @Valid @RequestBody ConfirmPaymentRequest request) {
+	@PostMapping("/confirm")
+	public ResponseEntity<PaymentResponse> confirmPayment(
+	        @Valid @RequestBody ConfirmPaymentRequest request) {
 
-        OrderResponse response = orderService.confirmPayment(request);
-        return ResponseEntity.ok(ApiResponse.success("Payment confirmed successfully", response));
-    }
+	    return ResponseEntity.ok(
+	        paymentService.confirmPayment(request)
+	    );
+	}
+      
 }

@@ -16,6 +16,8 @@ import com.ecommerce.entity.Category;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.ProductImage;
 import com.ecommerce.enums.ProductStatus;
+import com.ecommerce.exception.BadRequestException;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.mapper.ProductMapper;
 import com.ecommerce.repository.BrandRepository;
 import com.ecommerce.repository.CategoryRepository;
@@ -23,33 +25,60 @@ import com.ecommerce.repository.ProductImageRepository;
 import com.ecommerce.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
-
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 	private final ProductRepository productRepository;
 	private final BrandRepository brandRepository;
 	private final CategoryRepository categoryRepository;
 	private final FileStorageService fileStorageService;
 	private final ProductImageRepository productImageRepository;
-	
-	public ProductService(
-			ProductRepository productRepository, 
-			BrandRepository brandRepository, 
-			CategoryRepository categoryRepository, 
-			ProductImageRepository productImageRepository, 
-			FileStorageService fileStorageService) {
-		this.productRepository = productRepository;
-		this.brandRepository = brandRepository;
-		this.categoryRepository = categoryRepository;
-		this.productImageRepository = productImageRepository;
-		this.fileStorageService = fileStorageService;
-	}
+
 	
 	public Page<ProductResponse> getAllProducts(Pageable pageable) {
 	    return productRepository
 	    		.findByStatus(ProductStatus.ACTIVE, pageable)
 	            .map(ProductMapper::toResponse);
+	}
+	
+	public Product findById(Long id) {
+	    return productRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Product", id));
+	}
+	
+	  public void validateStock(Long productId, int qty) {
+
+	        Product product = findById(productId);
+
+	        if (product.getStockQuantity() < qty) {
+	            throw new BadRequestException(
+	                    "Insufficient stock: " + product.getName()
+	            );
+	        }
+	    }
+	
+	@Transactional
+	public void deductStock(Long productId, int qty) {
+
+	    Product product = productRepository.findById(productId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
+
+	    if (product.getStockQuantity() < qty) {
+	        throw new BadRequestException("Insufficient stock for product: " + product.getName());
+	    }
+
+	    product.setStockQuantity(product.getStockQuantity() - qty);
+	}
+	
+	@Transactional
+	public void restoreStock(Long productId, int qty) {
+
+	    Product product = productRepository.findById(productId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
+
+	    product.setStockQuantity(product.getStockQuantity() + qty);
 	}
 	
 	public ProductResponse getProductById(Long id) {
@@ -119,11 +148,6 @@ public class ProductService {
 	        product.setStatus(request.getStatus());
 	    }
 		 
-		    product.setName(request.getName());
-		    product.setPrice(request.getPrice());
-		    product.setStockQuantity(request.getStockQuantity());
-		    product.setStatus(request.getStatus());
-
 		    product.setRam(request.getRam());
 		    product.setStorage(request.getStorage());
 		    product.setBattery(request.getBattery());

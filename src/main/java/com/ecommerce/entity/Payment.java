@@ -2,13 +2,10 @@ package com.ecommerce.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.ecommerce.enums.PaymentMethod;
 import com.ecommerce.enums.PaymentStatus;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,41 +17,39 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Payment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "method")
-    private PaymentMethod method;
-
-    private BigDecimal amount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private PaymentStatus status;
-
-    @Column(name = "transaction_id")
-    private String transactionId;
-
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
- 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Refund refund;
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "payment_id")
+	private Long id;
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_id")
+	private Order order;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "method")
+	private PaymentMethod method;
+	
+	private BigDecimal amount;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status")
+	private PaymentStatus status;
+	
+	@Column(name = "transaction_id")
+	private String transactionId;
+	
+	@Column(name = "paid_at")
+	private LocalDateTime paidAt;
+	
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+	
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+	
+	@OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Refund refund;
 }

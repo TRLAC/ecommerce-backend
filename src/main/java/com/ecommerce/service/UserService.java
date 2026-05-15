@@ -2,6 +2,7 @@ package com.ecommerce.service;
 
 import java.util.Set;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import com.ecommerce.dto.request.UpdateProfileRequest;
 import com.ecommerce.dto.response.ProfileResponse;
 import com.ecommerce.entity.Role;
 import com.ecommerce.entity.User;
+import com.ecommerce.mapper.ProfileMapper;
 import com.ecommerce.repository.RoleRepository;
 import com.ecommerce.repository.UserRepository;
 
@@ -17,11 +19,13 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
+	private final ProfileMapper profileMapper;
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	
-	public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+	public UserService(ProfileMapper profileMapper ,UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+		this.profileMapper = profileMapper;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
@@ -44,26 +48,29 @@ public class UserService {
 		
 		User user = new User();
 		user.setEmail(request.getEmail());
+		user.setFullName(request.getFullname());
 		user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 		user.setRoles(Set.of(userRole));
 		
 		return userRepository.save(user);	
 	}
 	
-	public ProfileResponse getProfile(String email) {
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-		
-		return new ProfileResponse(
-				user.getEmail(),
-				user.getFullName(),
-				user.getPhone()
-		);
+	public ProfileResponse getProfile() {
+		 String email = SecurityContextHolder.getContext()
+		            .getAuthentication()
+		            .getName();
+	    User user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    return profileMapper.mapToProfile(user);
 	}
 	
 	@Transactional
-	public void updateProfile(String email, UpdateProfileRequest request) {
-
+	public void updateProfile(UpdateProfileRequest request) {
+		 String email = SecurityContextHolder.getContext()
+		            .getAuthentication()
+		            .getName();
+		 
 	    User user = userRepository.findByEmail(email)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -74,8 +81,11 @@ public class UserService {
 	    if (request.getPhone() != null) {
 	        user.setPhone(request.getPhone());
 	    }
+	    
+	    if (request.getAvatar() != null) {
+	        user.setAvatar(request.getAvatar());
+	    }
 
 	    userRepository.save(user);
-	}
-	
+	}	
 }

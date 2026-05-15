@@ -24,13 +24,14 @@ public class RefreshTokenService {
 
     public RefreshToken create(User user) {
 
-        // Xoá token cũ của user (nếu có)
+        // chỉ giữ 1 token/user
         refreshTokenRepository.deleteByUser(user);
 
         RefreshToken token = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(user)
                 .expiresAt(LocalDateTime.now().plusDays(7))
+                .revoked(false)
                 .build();
 
         return refreshTokenRepository.save(token);
@@ -62,14 +63,23 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-
-    public RefreshToken rotate(RefreshToken oldToken) {
-        oldToken.setRevoked(true);
-        refreshTokenRepository.save(oldToken);
-        return create(oldToken.getUser());
-    }
-
     public void delete(RefreshToken token) {
         refreshTokenRepository.delete(token);
     }
+
+    public RefreshToken rotate(RefreshToken oldToken) {
+        // 1. revoke token cũ
+        oldToken.setRevoked(true);
+        refreshTokenRepository.save(oldToken);
+
+        // 2. tạo token mới
+        RefreshToken newToken = RefreshToken.builder()
+                .token(UUID.randomUUID().toString())
+                .user(oldToken.getUser())
+                .expiresAt(LocalDateTime.now().plusDays(7))
+                .build();
+
+        return refreshTokenRepository.save(newToken);
+    }
+
 }

@@ -4,22 +4,36 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.dto.filter.OrderFilter;
-import com.ecommerce.dto.request.*;
-import com.ecommerce.dto.response.*;
-import com.ecommerce.entity.*;
+import com.ecommerce.dto.request.CancelOrderRequest;
+import com.ecommerce.dto.request.OrderItemRequest;
+import com.ecommerce.dto.request.PlaceOrderRequest;
+import com.ecommerce.dto.request.UpdateOrderStatusRequest;
+import com.ecommerce.dto.response.OrderResponse;
+import com.ecommerce.dto.response.PageResponse;
+import com.ecommerce.entity.Order;
+import com.ecommerce.entity.OrderItem;
+import com.ecommerce.entity.OrderStatusLog;
+import com.ecommerce.entity.Product;
+import com.ecommerce.entity.User;
 import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.mapper.OrderMapper;
-import com.ecommerce.repository.*;
+import com.ecommerce.repository.OrderItemRepository;
+import com.ecommerce.repository.OrderRepository;
+import com.ecommerce.repository.OrderSpecification;
+import com.ecommerce.repository.OrderStatusLogRepository;
+import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.OrderService;
-import com.ecommerce.service.PaymentService;
-import com.ecommerce.service.ShippingService;
+import com.ecommerce.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,58 +47,52 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderStatusLogRepository orderStatusLogRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
-
-    // ✅ dùng interface
-    private final PaymentService paymentService;
-    private final ShippingService shippingService;
-
-    // ================================================================
-    // USER: PLACE ORDER
-    // ================================================================
+  
     @Override
     public OrderResponse placeOrder(Long userId, PlaceOrderRequest request) {
+    	log.info("Placing order for user: {}", userId);
+    	
+    	if(request.getItems() == null || request.getItems().isEmpty()) {
+    		throw new BadRequestException("Order must contain at least one item");
+    	}
+    	
+    	User user = getUser(userId);
+    	List<OrderItem> items = new ArrayList<>();
+    	BigDecimal total = BigDecimal.ZERO;
+    	
+    	for(OrderItemRequest itemReq : request.getItems()) {
+    		Product product = productService.findById(itemReq.getProductId());
+    		
+    		  productService.deductStock(product.getProductId(), itemReq.getQuantity());
 
-        User user = getUser(userId);
-
-        List<OrderItem> items = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (OrderItemRequest itemReq : request.getItems()) {
-
-            Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", itemReq.getProductId()));
-
-            OrderItem item = OrderItem.builder()
-                    .product(product)
-                    .quantity(itemReq.getQuantity())
-                    .priceSnapshot(product.getPrice())
-                    .build();
-
-            items.add(item);
-
-            total = total.add(product.getPrice()
-                    .multiply(BigDecimal.valueOf(itemReq.getQuantity())));
-        }
-
-        Order order = Order.builder()
-                .user(user)
-                .totalAmount(total)
-                .status(OrderStatus.PENDING)
-                .build();
-
-        orderRepository.save(order);
-
+    		OrderItem item = OrderItem.builder()
+    				.product(product)
+    				.quantity(itemReq.getQuantity())
+    				.priceSnapshot(product.getPrice())
+    				.build();
+    		
+    		items.add(item);
+    		total = total.add(product.getPrice()
+    				.multiply(BigDecimal.valueOf(itemReq.getQuantity())));
+    	}
+    	
+    	Order order = Order.builder()
+    			.user(user)
+    			.totalAmount(total)
+    			.status(OrderStatus.PENDING)
+    			.build();
+    	orderRepository.save(order);
+    	log.info("Order created with ID: {}", order.getId());
+    	
+    	// Save order items
         items.forEach(i -> i.setOrder(order));
         orderItemRepository.saveAll(items);
 
+        // Log status change
         logStatusChange(order, null, OrderStatus.PENDING, user);
-
-        // 👉 chỉ trigger
-        paymentService.createPayment(order.getId(), request.getPaymentMethod());
-        shippingService.createShipping(order.getId(), request.getShippingAddress());
 
         return orderMapper.toOrderResponse(order);
     }
@@ -92,6 +100,7 @@ public class OrderServiceImpl implements OrderService {
     // ================================================================
     // USER: VIEW ORDER
     // ================================================================
+    
     @Override
     @Transactional(readOnly = true)
     public OrderResponse viewOrder(Long orderId, Long userId) {
@@ -104,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
     // ================================================================
     // USER: MY ORDERS
     // ================================================================
+    
     @Override
     @Transactional(readOnly = true)
     public PageResponse<OrderResponse> getMyOrders(Long userId, OrderFilter filter) {
@@ -114,6 +124,7 @@ public class OrderServiceImpl implements OrderService {
     // ================================================================
     // USER: CANCEL ORDER
     // ================================================================
+    
     @Override
     public OrderResponse cancelOrder(Long orderId, Long userId, CancelOrderRequest request) {
 
@@ -123,6 +134,13 @@ public class OrderServiceImpl implements OrderService {
         if (!isCancellable(order.getStatus())) {
             throw new BadRequestException("Cannot cancel order");
         }
+        
+        for (OrderItem item : order.getOrderItems()) {
+            productService.restoreStock(
+                    item.getProduct().getProductId(),
+                    item.getQuantity()
+            );
+        }
 
         OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
@@ -131,15 +149,13 @@ public class OrderServiceImpl implements OrderService {
 
         logStatusChange(order, previousStatus, OrderStatus.CANCELLED, user);
 
-        // 👉 refund nếu đã thanh toán
-        paymentService.refundIfPaid(orderId, request.getReason());
-
         return orderMapper.toOrderResponse(order);
     }
 
     // ================================================================
     // ADMIN: UPDATE STATUS
     // ================================================================
+    
     @Override
     public OrderResponse updateOrderStatus(Long orderId, Long adminId, UpdateOrderStatusRequest request) {
 
@@ -159,27 +175,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // ================================================================
-    // SYSTEM: PAYMENT SUCCESS
-    // ================================================================
-    @Override
-    public void markAsPaid(Long orderId) {
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
-
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("Invalid order state");
-        }
-
-        OrderStatus previousStatus = order.getStatus();
-        order.setStatus(OrderStatus.CONFIRMED);
-
-        logStatusChange(order, previousStatus, OrderStatus.CONFIRMED, null);
-    }
-
-    // ================================================================
     // HELPERS
     // ================================================================
+    
     private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
@@ -218,7 +216,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private PageResponse<OrderResponse> buildPageResponse(OrderFilter filter) {
-
+    	
         Sort sort = filter.getSortDir().equalsIgnoreCase("asc")
                 ? Sort.by(filter.getSortBy()).ascending()
                 : Sort.by(filter.getSortBy()).descending();
@@ -249,4 +247,55 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponse manageOrder(Long orderId, Long adminId, UpdateOrderStatusRequest request) {
 	    return updateOrderStatus(orderId, adminId, request);
 	}
+	
+	
+	 @Override
+	    public void markAsPaid(Long orderId) {
+
+	        Order order = orderRepository.findById(orderId)
+	                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+	        if (order.getStatus() != OrderStatus.PENDING) {
+	            throw new BadRequestException("Invalid order state");
+	        }
+
+	        OrderStatus previousStatus = order.getStatus();
+	        order.setStatus(OrderStatus.CONFIRMED);
+
+	        logStatusChange(order, previousStatus, OrderStatus.CONFIRMED, null);
+	        
+	        orderRepository.save(order);
+	    }
+	 
+	 @Override
+	 public void markAsRefunded(Long orderId) {
+
+		    Order order = orderRepository.findById(orderId)
+		            .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+		    OrderStatus oldStatus = order.getStatus();
+		    order.setStatus(OrderStatus.REFUNDED);
+
+		    logStatusChange(order, oldStatus, OrderStatus.REFUNDED, null);
+
+		    orderRepository.save(order);
+		}
+
+	@Override
+	public void markAsShipped(Long orderId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public OrderResponse getOrderByIdForAdmin(Long orderId) {
+
+	    Order order = orderRepository.findByIdWithDetails(orderId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+	    return orderMapper.toOrderResponse(order);
+	}
+
+	
 }

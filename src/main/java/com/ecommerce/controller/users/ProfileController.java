@@ -1,10 +1,10 @@
 package com.ecommerce.controller.users;
 
-import java.security.Principal;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,21 +27,15 @@ public class ProfileController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<ProfileResponse> getProfile(
-	        Principal principal
-	) {
-	    return ResponseEntity.ok(
-	            userService.getProfile(principal.getName())
-	    );
+	public ResponseEntity<ProfileResponse> getProfile() {
+	    return ResponseEntity.ok(userService.getProfile());
 	}
 	
 	@PutMapping
 	public ResponseEntity<?> updateProfile(
-	        @Valid @RequestBody UpdateProfileRequest request,
-	        Principal principal
+	        @Valid @RequestBody UpdateProfileRequest request
 	) {
-	    userService.updateProfile(principal.getName(), request);
-
+		  userService.updateProfile(request);
 	    return ResponseEntity.ok(
 	            Map.of("message", "Profile updated successfully")
 	    );

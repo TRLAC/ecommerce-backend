@@ -30,8 +30,4 @@ public class Role {
 	
 	@Column(name = "role_name", nullable = false,unique = true)
 	private String name;
-	
-	@ManyToMany(mappedBy = "roles")
-	private Set<User> users;
-	
 }

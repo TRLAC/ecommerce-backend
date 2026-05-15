@@ -53,24 +53,6 @@ public class OrderAdminController {
         return ResponseEntity.ok(orderService.manageOrder(id, adminId, request));
     }
 
-    @PostMapping("/{id}/refund")
-    public ResponseEntity<OrderResponse> refundPayment(
-            @PathVariable Long id,
-            @Valid @RequestBody RefundRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long adminId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.refundPayment(id, adminId, request));
-    }
-
-    @PatchMapping("/{id}/shipping")
-    public ResponseEntity<OrderResponse> updateShipping(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateShippingRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long adminId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.updateShipping(id, adminId, request));
-    }
-
     // JWT username = email → dùng UserService.findByEmail() để lấy id
     private Long getCurrentUserId(UserDetails userDetails) {
         return userService.findByEmail(userDetails.getUsername()).getId();

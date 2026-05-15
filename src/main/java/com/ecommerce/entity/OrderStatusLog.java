@@ -1,11 +1,8 @@
 package com.ecommerce.entity;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import com.ecommerce.enums.OrderStatus;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,29 +27,28 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class OrderStatusLog {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "log_id")
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "old_status")
-    private OrderStatus oldStatus;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "new_status")
-    private OrderStatus newStatus;
-
-    @ManyToOne
-    @JoinColumn(name = "changed_by")
-    private User changedBy;
-
-    @CreationTimestamp
-    @Column(name = "changed_at", nullable = false, updatable = false)
-    private LocalDateTime changedAt;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "log_id")
+	private Long id;
+	
+	@ManyToOne
+	@JoinColumn(name = "order_id")
+	private Order order;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "old_status")
+	private OrderStatus oldStatus;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "new_status")
+	private OrderStatus newStatus;
+	
+	@ManyToOne
+	@JoinColumn(name = "changed_by")
+	private User changedBy;
+	
+	@CreationTimestamp
+	@Column(name = "changed_at", nullable = false, updatable = false)
+	private LocalDateTime changedAt;
 }
