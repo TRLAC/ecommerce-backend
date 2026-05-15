@@ -104,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderResponse viewOrder(Long orderId, Long userId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+        Order order = orderRepository.findByIdAndUser_Id(orderId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
 
         return orderMapper.toOrderResponse(order);
@@ -128,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse cancelOrder(Long orderId, Long userId, CancelOrderRequest request) {
 
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+        Order order = orderRepository.findByIdAndUser_Id(orderId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderId));
 
         if (!isCancellable(order.getStatus())) {

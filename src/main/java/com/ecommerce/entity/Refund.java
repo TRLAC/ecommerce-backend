@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "REFUND")
+@Table(name = "refunds")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,10 +36,10 @@ public class Refund {
 	private RefundStatus status;
 	
 	@CreationTimestamp
-	@Column(name = "create_at", updatable = false)
+	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
 	
 	@UpdateTimestamp
-	@Column(name = "update_at")
+	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 }

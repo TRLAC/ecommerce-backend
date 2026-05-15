@@ -36,7 +36,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             LEFT JOIN FETCH o.shipping
             WHERE o.id = :orderId AND o.user.id = :userId
             """)
-    Optional<Order> findByIdAndUserId(@Param("orderId") Long orderId, @Param("userId") Long userId);
+    Optional<Order> findByIdAndUser_Id(@Param("orderId") Long orderId, @Param("userId") Long userId);
 
     boolean existsByIdAndUser_Id(Long id, Long userId);
 }

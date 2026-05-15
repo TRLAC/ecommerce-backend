@@ -3,7 +3,7 @@ package com.ecommerce.enums;
 public enum ShippingStatus {
 	PENDING,
     PROCESSING,
-    SHIPPED,
+    SHIPPING,
     IN_TRANSIT,
     DELIVERED,
     RETURNED,
