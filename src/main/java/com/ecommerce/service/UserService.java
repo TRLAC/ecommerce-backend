@@ -18,17 +18,21 @@ import com.ecommerce.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class UserService {
 	private final ProfileMapper profileMapper;
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
+	 private final FileStorageService fileStorageService;
 	
-	public UserService(ProfileMapper profileMapper ,UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+	public UserService(ProfileMapper profileMapper ,UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,  FileStorageService fileStorageService) {
 		this.profileMapper = profileMapper;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.fileStorageService = fileStorageService;
+		
 	}
 	
 	public User findByEmail(String email) {
@@ -36,7 +40,7 @@ public class UserService {
 				.orElseThrow(() -> new RuntimeException("User not found")); 
 	}
 	
-	@Transactional
+	
 	public User register(RegisterRequest request) {
 		
 		if(userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -65,12 +69,12 @@ public class UserService {
 	    return profileMapper.mapToProfile(user);
 	}
 	
-	@Transactional
-	public void updateProfile(UpdateProfileRequest request) {
-		 String email = SecurityContextHolder.getContext()
-		            .getAuthentication()
-		            .getName();
-		 
+	public ProfileResponse updateProfile(UpdateProfileRequest request) {
+
+	    String email = SecurityContextHolder.getContext()
+	            .getAuthentication()
+	            .getName();
+
 	    User user = userRepository.findByEmail(email)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -81,11 +85,15 @@ public class UserService {
 	    if (request.getPhone() != null) {
 	        user.setPhone(request.getPhone());
 	    }
-	    
-	    if (request.getAvatar() != null) {
-	        user.setAvatar(request.getAvatar());
-	    }
 
-	    userRepository.save(user);
-	}	
+	    if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
+            fileStorageService.delete(user.getAvatar()); // ✅ xóa ảnh cũ
+            String fileName = fileStorageService.save(request.getAvatar()); // ✅ lưu file thật
+            user.setAvatar(fileName);
+        }
+
+	    User savedUser = userRepository.save(user);
+
+	    return profileMapper.mapToProfile(savedUser);
+	}
 }

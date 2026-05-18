@@ -22,54 +22,54 @@ import com.ecommerce.security.JwtAuthenticationFilter;
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-	
-	private final JwtAuthenticationFilter jwtFilter;
-	
-	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
-		this.jwtFilter = jwtFilter;
-	}
-	
-	@Bean
+
+    private final JwtAuthenticationFilter jwtFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
-	@Bean
-	public AuthenticationManager authenticationManager(
-	        AuthenticationConfiguration config) throws Exception {
-	    return config.getAuthenticationManager();
-	}
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http
-			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-			.csrf(csrf -> csrf.disable())
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/api/auth/**").permitAll()
-					.requestMatchers("/api/admin/**").hasRole("ADMIN")
-					.requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
-					.anyRequest().authenticated()
-			)
-		
-		.addFilterBefore(
-                jwtFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
-		return http.build();
-	}
-	
-	 @Bean
-	    public CorsConfigurationSource corsConfigurationSource() {
-	        CorsConfiguration cfg = new CorsConfiguration();
-	        cfg.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // hoặc config theo property
-	        cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
-	        cfg.setAllowedHeaders(Arrays.asList("*"));
-	        cfg.setExposedHeaders(Arrays.asList("Authorization"));
-	        cfg.setAllowCredentials(true);
-	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        source.registerCorsConfiguration("/**", cfg);
-	        return source;
-	    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()  // ✅ fix 403 ảnh
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        cfg.setAllowedHeaders(Arrays.asList("*"));
+        cfg.setExposedHeaders(Arrays.asList("Authorization"));
+        cfg.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg); // ✅ cover cả /uploads/**
+        return source;
+    }
 }

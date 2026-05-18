@@ -3,9 +3,8 @@ package com.ecommerce.controller.users;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,13 +30,12 @@ public class ProfileController {
 	    return ResponseEntity.ok(userService.getProfile());
 	}
 	
-	@PutMapping
+	@PutMapping(consumes = "multipart/form-data")
 	public ResponseEntity<?> updateProfile(
-	        @Valid @RequestBody UpdateProfileRequest request
+	        @Valid @ModelAttribute UpdateProfileRequest request
 	) {
-		  userService.updateProfile(request);
-	    return ResponseEntity.ok(
-	            Map.of("message", "Profile updated successfully")
-	    );
+		
+		 ProfileResponse updated = userService.updateProfile(request);
+	    return ResponseEntity.ok(updated);
 	}
 }

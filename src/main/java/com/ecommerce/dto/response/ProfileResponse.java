@@ -1,5 +1,7 @@
 package com.ecommerce.dto.response;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,4 +13,5 @@ public class ProfileResponse {
 	private String fullName;
 	private String phone;
 	private String  avatar;
+	private List<String> roles;
 }

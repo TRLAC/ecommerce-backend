@@ -1,14 +1,12 @@
 package com.ecommerce.controller;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.ecommerce.dto.request.LoginRequest;
 import com.ecommerce.dto.request.RegisterRequest;
 import com.ecommerce.dto.response.AuthResponse;
+import com.ecommerce.dto.response.ProfileResponse;
 import com.ecommerce.dto.response.UserResponse;
 import com.ecommerce.entity.RefreshToken;
-import com.ecommerce.entity.Role;
 import com.ecommerce.entity.User;
+import com.ecommerce.mapper.ProfileMapper;
 import com.ecommerce.security.CustomUserDetails;
 import com.ecommerce.security.JwtUtil;
 import com.ecommerce.service.RefreshTokenService;
@@ -40,17 +39,20 @@ public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final ProfileMapper profileMapper; 
 
     public AuthController(
             AuthenticationManager authenticationManager,
             UserService userService,
             JwtUtil jwtUtil,
-            RefreshTokenService refreshTokenService
+            RefreshTokenService refreshTokenService,
+            ProfileMapper profileMapper
     ) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
+        this.profileMapper = profileMapper;
     }
     
     // ================= REGISTER =================
@@ -154,13 +156,15 @@ public class AuthController {
     
     
     private UserResponse toUserResponse(User user) {
+        ProfileResponse profile = profileMapper.mapToProfile(user);
+
         return new UserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getFullName(),
-                user.getRoles().stream()
-                        .map(Role::getName)
-                        .toList()
+                profile.getId(),
+                profile.getEmail(),
+                profile.getFullName(),
+                profile.getPhone(),
+                profile.getAvatar(),  // ✅ full URL từ ProfileMapper
+                profile.getRoles()
         );
     }
 
