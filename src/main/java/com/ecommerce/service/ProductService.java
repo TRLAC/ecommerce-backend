@@ -23,6 +23,7 @@ import com.ecommerce.repository.BrandRepository;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.ProductImageRepository;
 import com.ecommerce.repository.ProductRepository;
+import com.ecommerce.specification.ProductSpecification;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +37,6 @@ public class ProductService {
 	private final FileStorageService fileStorageService;
 	private final ProductImageRepository productImageRepository;
 
-	
-	public Page<ProductResponse> getAllProducts(Pageable pageable) {
-	    return productRepository
-	    		.findByStatus(ProductStatus.ACTIVE, pageable)
-	            .map(ProductMapper::toResponse);
-	}
 	
 	public Product findById(Long id) {
 	    return productRepository.findById(id)
@@ -81,13 +76,6 @@ public class ProductService {
 	    product.setStockQuantity(product.getStockQuantity() + qty);
 	}
 	
-	public ProductResponse getProductById(Long id) {
-		Product product = productRepository.findById(id)
-				.filter(p -> p.getStatus() == ProductStatus.ACTIVE)
-				.orElseThrow(() -> new RuntimeException("Product not found"));
-		return ProductMapper.toResponse(product);
-	}
-	
 	@Transactional
 	public ProductResponse createProduct(CreateProductRequest request) {
 		 
@@ -117,8 +105,7 @@ public class ProductService {
 	@Transactional
 	public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
 		
-		Product product = productRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Product not found"));
+		Product product = findById(id);
 		
 		if (request.getBrandId() != null) {
 	        Brand brand = brandRepository.findById(request.getBrandId())
@@ -148,20 +135,31 @@ public class ProductService {
 	        product.setStatus(request.getStatus());
 	    }
 		 
-		    product.setRam(request.getRam());
-		    product.setStorage(request.getStorage());
-		    product.setBattery(request.getBattery());
-		    product.setScreenSize(request.getScreenSize());
+	    if(request.getRam() != null){
+	        product.setRam(request.getRam());
+	    }
 
-		    productRepository.save(product);
+	    if(request.getStorage() != null){
+	        product.setStorage(request.getStorage());
+	    }
+
+	    if(request.getBattery() != null){
+	        product.setBattery(request.getBattery());
+	    }
+
+	    if(request.getScreenSize() != null){
+	        product.setScreenSize(
+	            request.getScreenSize()
+	        );
+	    }
+	    
 		return ProductMapper.toResponse(product);
 	}
 	
 	@Transactional
 	 public void uploadImages(Long productId, List<MultipartFile> files) {
 
-	        Product product = productRepository.findById(productId)
-	                .orElseThrow(() -> new RuntimeException("Product not found"));
+	        Product product = findById(productId);
 
 	        for (MultipartFile file : files) {
 
@@ -177,27 +175,42 @@ public class ProductService {
 
 	@Transactional
 	public void hideProduct(Long id) {
-		Product product = productRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Product not found"));
+		Product product = findById(id);
 		
 		product.setStatus(ProductStatus.INACTIVE);
-		
-		productRepository.save(product);
 	}
 	
 	public Page<ProductResponse> getProducts(Pageable pageable, ProductFilter filter) {
 		if(filter == null){
-		    filter = new ProductFilter();
+		    filter = ProductFilter
+		    		.builder()
+		    		.build();
 		}
-		Page<Product> products = productRepository.searchProducts(
-				 filter.getKeyword(),
-		            filter.getMinPrice(),
-		            filter.getMaxPrice(),
-		            filter.getCategoryId(),
-		            ProductStatus.ACTIVE,
-		            pageable
+		
+		Page<Product> products = productRepository.findAll(
+								ProductSpecification.filter(filter),
+								pageable
 		      );
 		 return products.map(ProductMapper::toResponse);
+	}
+	
+	public ProductResponse getProductById(Long id){
+
+	    Product product = findById(id);
+
+	    if(
+	        product.getStatus()
+	        != ProductStatus.ACTIVE
+	    ){
+
+	        throw new ResourceNotFoundException(
+	            "Product",
+	            id
+	        );
+
+	    }
+
+	    return ProductMapper.toResponse(product);
 	}
 }
 

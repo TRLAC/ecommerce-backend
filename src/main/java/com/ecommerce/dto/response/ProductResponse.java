@@ -2,6 +2,8 @@ package com.ecommerce.dto.response;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ecommerce.entity.Brand;
+import com.ecommerce.entity.Category;
 import com.ecommerce.enums.ProductStatus;
 
 import lombok.Getter;
@@ -28,6 +30,8 @@ public class ProductResponse {
 
     private List<String> images;
     
+    private Long brandId;
     private String brandName;
+    private Long categoryId;
     private String categoryName;
 }

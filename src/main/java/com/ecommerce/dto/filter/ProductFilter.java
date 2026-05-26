@@ -18,4 +18,9 @@ public class ProductFilter {
 	private BigDecimal minPrice;
 	private BigDecimal maxPrice;
 	private Long categoryId;
+	private String categoryName;
+	private Long brandId;
+	private String brandName;
+    private Integer ram;
+    private Integer storage;
 }

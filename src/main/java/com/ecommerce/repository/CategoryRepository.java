@@ -12,12 +12,12 @@ import com.ecommerce.entity.Category;
 import com.ecommerce.enums.CategoryStatus;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-	boolean existsByName(String name);
+	boolean existsByCategoryName(String name);
 	List<Category> findByParentIsNullAndStatus(CategoryStatus  status);
-    Page<Category> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Category> findByCategoryNameContainingIgnoreCase(String name, Pageable pageable);
     @Query("""
             SELECT c FROM Category c
-            WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+            WHERE (:name IS NULL OR LOWER(c.categoryName) LIKE LOWER(CONCAT('%', :name, '%')))
               AND (:status IS NULL OR c.status = :status)
             """)
         Page<Category> findAllWithFilter(

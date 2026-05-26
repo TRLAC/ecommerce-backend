@@ -48,8 +48,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/uploads/**").permitAll()  // ✅ fix 403 ảnh
+                .requestMatchers(
+                		"/api/auth/**",
+                		"/uploads/**",
+                	    "/api/products/**",
+                	    "/api/brands/**",
+                	    "/api/categories/**"
+                ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()

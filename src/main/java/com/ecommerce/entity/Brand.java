@@ -23,8 +23,8 @@ public class Brand {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long brandId;
 	
-	@Column(nullable = false, unique = true)
-	private String name;
+	@Column(name = "name", nullable = false, unique = true)
+	private String brandName;
 	
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)

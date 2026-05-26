@@ -21,11 +21,13 @@ public class ProductMapper {
         res.setStatus(product.getStatus());
 
         if (product.getBrand() != null) {
-            res.setBrandName(product.getBrand().getName());
+            res.setBrandId(product.getBrand().getBrandId());
+            res.setBrandName(product.getBrand().getBrandName());
         }
-        
+
         if (product.getCategory() != null) {
-            res.setCategoryName(product.getCategory().getName());
+            res.setCategoryId(product.getCategory().getCategoryId());
+            res.setCategoryName(product.getCategory().getCategoryName());
         }
 
         res.setRam(product.getRam());

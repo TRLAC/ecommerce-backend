@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,30 +13,32 @@ import org.springframework.data.repository.query.Param;
 import com.ecommerce.entity.Product;
 import com.ecommerce.enums.ProductStatus;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
-	@Query("""
-			SELECT p FROM Product p
-			WHERE p.status = :status
-			AND (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
-			AND (:minPrice IS NULL OR p.price >= :minPrice)
-			AND (:maxPrice IS NULL OR p.price <= :maxPrice)
-			AND (:categoryId IS NULL OR p.category.categoryId = :categoryId)
-			""")
-			Page<Product> searchProducts(
-			        @Param("keyword") String keyword,
-			        @Param("minPrice") BigDecimal  minPrice,
-			        @Param("maxPrice") BigDecimal  maxPrice,
-			        @Param("categoryId") Long categoryId,
-			        @Param("status") ProductStatus status,
-			        Pageable pageable
-			);
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+
 	Page<Product> findByStatus(ProductStatus status, Pageable pageable);
+
+	@Modifying
+	@Query("""
+			    UPDATE Product p
+			    SET p.stockQuantity =
+			        p.stockQuantity - :qty
+			    WHERE p.productId = :productId
+			    AND p.stockQuantity >= :qty
+			""")
+	int deductStock(@Param("productId") Long productId,
+
+			@Param("qty") int qty);
 	
-	 @Modifying
-	    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity - :qty WHERE p.productId = :productId AND p.stockQuantity >= :qty")
-	    int deductStock(@Param("productId") Long productId, @Param("qty") int qty);
-	 
-	    @Modifying
-	    @Query("UPDATE Product p SET p.stockQuantity = p.stockQuantity + :qty WHERE p.productId = :productId")
-	    void restoreStock(@Param("productId") Long productId, @Param("qty") int qty);
-	}
+
+	@Modifying
+	@Query("""
+			    UPDATE Product p
+			    SET p.stockQuantity =
+			        p.stockQuantity + :qty
+			    WHERE p.productId = :productId
+			""")
+	void restoreStock(@Param("productId") Long productId,
+
+			@Param("qty") int qty);
+
+}

@@ -10,7 +10,7 @@ import lombok.Setter;
 public class CategoryResponse {
 
     private Long categoryId;
-    private String name;
+    private String categoryName;
     private String status;
     private Long parentId;
     private LocalDateTime createdAt;

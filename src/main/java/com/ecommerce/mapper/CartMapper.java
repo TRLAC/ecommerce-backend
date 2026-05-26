@@ -31,7 +31,7 @@ public class CartMapper {
                 .productName(item.getProduct().getName())
                 .productImageUrl(imageUrl)
                 .productPrice(price)
-                .productBrand(item.getProduct().getBrand() != null ? item.getProduct().getBrand().getName() : null)
+                .productBrand(item.getProduct().getBrand() != null ? item.getProduct().getBrand().getBrandName() : null)
                 .quantity(item.getQuantity())
                 .totalPrice(totalPrice)
                 .createdAt(item.getCreatedAt())

@@ -37,12 +37,12 @@ public class CategoryService {
             throw new RuntimeException("Category name is required");
         }
 
-        if (categoryRepository.existsByName(request.getName())) {
+        if (categoryRepository.existsByCategoryName(request.getName())) {
             throw new RuntimeException("Category already exists");
         }
 
         Category category = new Category();
-        category.setName(request.getName().trim());
+        category.setCategoryName(request.getName().trim());
 
         if (request.getParentId() != null) {
 
@@ -63,7 +63,7 @@ public class CategoryService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         if (request.getName() != null && !request.getName().trim().isEmpty()) {
-            category.setName(request.getName().trim());
+            category.setCategoryName(request.getName().trim());
         }
 
         if (request.getParentId() != null) {
@@ -101,7 +101,7 @@ public class CategoryService {
         if (keyword == null) {
             keyword = "";
         }
-        return categoryRepository.findByNameContainingIgnoreCase(keyword, pageable)
+        return categoryRepository.findByCategoryNameContainingIgnoreCase(keyword, pageable)
                 .map(CategoryMapper::toResponse);
     }
     
@@ -123,5 +123,5 @@ public class CategoryService {
                 .map(CategoryMapper::toResponse)
                 .toList();
     }
-
+ 
 }

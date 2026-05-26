@@ -8,7 +8,7 @@ public class CategoryMapper {
     public static CategoryResponse toResponse(Category category) {
         CategoryResponse resp = new CategoryResponse();
         resp.setCategoryId(category.getCategoryId());
-        resp.setName(category.getName());
+        resp.setCategoryName(category.getCategoryName());
         resp.setParentId(category.getParent() != null ? category.getParent().getCategoryId() : null);
         resp.setStatus(category.getStatus().name());
         resp.setCreatedAt(category.getCreatedAt());
