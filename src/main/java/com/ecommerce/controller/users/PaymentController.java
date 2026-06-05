@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
 public class PaymentController {
 
 	 private final PaymentService paymentService;

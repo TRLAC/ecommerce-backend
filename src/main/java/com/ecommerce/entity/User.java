@@ -54,6 +54,9 @@ public class User {
 	    
 	    @Column(name = "avatar")
 	    private String avatar;
+	    
+	    @Column(name = "address")
+	    private String address;
 
 	    @CreatedDate
 	    @Column(name = "created_at", nullable = false, updatable = false)

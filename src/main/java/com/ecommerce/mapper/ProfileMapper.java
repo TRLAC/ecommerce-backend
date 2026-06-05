@@ -26,6 +26,7 @@ public class ProfileMapper {
                 user.getFullName(),
                 user.getPhone(),
                 avatarUrl,
+                user.getAddress(),
                 user.getRoles()
                         .stream()
                         .map(role -> role.getName())

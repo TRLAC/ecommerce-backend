@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_status_log")
+@Table(name = "order_status_logs")
 @Getter
 @Setter
 @NoArgsConstructor

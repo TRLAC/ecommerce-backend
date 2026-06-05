@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class OrderResponse {
-	  private Long Id;
+	  private Long id;
 	    private Long userId;
 	    private String userFullName;
 	    private String userEmail;

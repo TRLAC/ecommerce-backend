@@ -12,7 +12,7 @@ public class OrderMapper {
         if (order == null) return null;
 
         return OrderResponse.builder()
-                .Id(order.getId())
+                .id(order.getId())
                 .userId(order.getUser() != null ? order.getUser().getId() : null)
                 .userFullName(order.getUser() != null ? order.getUser().getFullName() : null)
                 .userEmail(order.getUser() != null ? order.getUser().getEmail() : null)

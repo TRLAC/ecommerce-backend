@@ -53,7 +53,9 @@ public class SecurityConfig {
                 		"/uploads/**",
                 	    "/api/products/**",
                 	    "/api/brands/**",
-                	    "/api/categories/**"
+                	    "/api/categories/**",
+                	    "/api/orders/**",
+                	    "/api/payments/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")

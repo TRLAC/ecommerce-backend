@@ -164,6 +164,7 @@ public class AuthController {
                 profile.getFullName(),
                 profile.getPhone(),
                 profile.getAvatar(),  // ✅ full URL từ ProfileMapper
+                profile.getAddress(),
                 profile.getRoles()
         );
     }
