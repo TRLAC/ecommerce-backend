@@ -46,7 +46,7 @@ public class OrderStatusLog {
 	
 	@ManyToOne
 	@JoinColumn(name = "changed_by")
-	private User changedBy;
+	private User changedBy;	
 	
 	@CreationTimestamp
 	@Column(name = "changed_at", nullable = false, updatable = false)
