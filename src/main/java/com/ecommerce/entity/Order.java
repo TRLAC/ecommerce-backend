@@ -67,6 +67,6 @@ public class Order {
 	@OneToOne(mappedBy = "order",  cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private Shipping shipping;
 	
-	@OneToMany(mappedBy = "order")
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderStatusLog> statusLogs;
 }

@@ -14,19 +14,19 @@ public class ProductMapper {
 
         ProductResponse res = new ProductResponse();
 
-        res.setProductId(product.getProductId());
+        res.setProductId(product.getId());
         res.setName(product.getName());
         res.setPrice(product.getPrice());
         res.setStockQuantity(product.getStockQuantity());
         res.setStatus(product.getStatus());
 
         if (product.getBrand() != null) {
-            res.setBrandId(product.getBrand().getBrandId());
+            res.setBrandId(product.getBrand().getId());
             res.setBrandName(product.getBrand().getBrandName());
         }
 
         if (product.getCategory() != null) {
-            res.setCategoryId(product.getCategory().getCategoryId());
+            res.setCategoryId(product.getCategory().getId());
             res.setCategoryName(product.getCategory().getCategoryName());
         }
 

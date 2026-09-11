@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 @Data
 public class UpdateOrderStatusRequest {
-	  @NotNull(message = "New status is required")
+	   @NotNull(message = "New status is required")
 	    private OrderStatus newStatus;
-	 
-	    private String note;
 }

@@ -43,16 +43,16 @@ public class ProductService {
 	            .orElseThrow(() -> new ResourceNotFoundException("Product", id));
 	}
 	
-	  public void validateStock(Long productId, int qty) {
+	public void validateStock(Long productId, int qty) {
 
-	        Product product = findById(productId);
+	     Product product = findById(productId);
 
-	        if (product.getStockQuantity() < qty) {
-	            throw new BadRequestException(
-	                    "Insufficient stock: " + product.getName()
-	            );
-	        }
-	    }
+	     if (product.getStockQuantity() < qty) {
+	         throw new BadRequestException(
+	                 "Insufficient stock: " + product.getName()
+	         );
+	     }
+	 }
 	
 	@Transactional
 	public void deductStock(Long productId, int qty) {

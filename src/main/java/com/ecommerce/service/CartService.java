@@ -45,23 +45,23 @@ public class CartService {
                 .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
 
         Optional<CartItem> existingItem =
-                cartItemRepository.findByCart_IdAndProduct_ProductId(
+                cartItemRepository.findByCart_IdAndProductId(
                         cart.getId(),
-                        product.getProductId()
+                        product.getId()
                 );
 
         existingItem.ifPresentOrElse(item -> {
 
             int newQty = item.getQuantity() + request.getQuantity();
 
-            productService.validateStock(product.getProductId(), newQty);
+            productService.validateStock(product.getId(), newQty);
 
             item.setQuantity(newQty);
             cartItemRepository.save(item);
 
         }, () -> {
 
-            productService.validateStock(product.getProductId(), request.getQuantity());
+            productService.validateStock(product.getId(), request.getQuantity());
 
             CartItem newItem = CartItem.builder()
                     .cart(cart)
@@ -82,12 +82,12 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("Cart item không tồn tại"));
 
         Product product = item.getProduct();
-        productService.validateStock(product.getProductId(), request.getQuantity());
+        productService.validateStock(product.getId(), request.getQuantity());
 
         item.setQuantity(request.getQuantity());
         cartItemRepository.save(item);
 
-        Cart cart = cartRepository.findByIdWithItems(item.getCart().getId())
+        Cart cart = cartRepository.findByIdWithItems(item.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng"));
 
         return cartMapper.toCartResponse(cart);

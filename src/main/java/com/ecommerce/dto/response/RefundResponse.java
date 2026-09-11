@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class RefundResponse {
 
-    private Long refundId;
+    private Long refund;
     private BigDecimal amount;
     private String reason;
     private RefundStatus status;

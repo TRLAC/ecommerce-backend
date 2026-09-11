@@ -19,7 +19,7 @@ public class PaymentMapper {
                 .method(payment.getMethod())
                 .amount(payment.getAmount())
                 .status(payment.getStatus())
-                .transactionId(payment.getTransactionId())
+                .transactionId(payment.getTransaction())
                 .paidAt(payment.getPaidAt())
                 .build();
     }

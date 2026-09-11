@@ -27,8 +27,7 @@ public class CartMapper {
 
         return CartItemResponse.builder()
                 .cartItemId(item.getId())
-                .productId(item.getProduct().getProductId())
-                .productName(item.getProduct().getName())
+                .productId(item.getProduct().getId())
                 .productImageUrl(imageUrl)
                 .productPrice(price)
                 .productBrand(item.getProduct().getBrand() != null ? item.getProduct().getBrand().getBrandName() : null)

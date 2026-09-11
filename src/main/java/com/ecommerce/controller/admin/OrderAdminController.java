@@ -1,13 +1,10 @@
 package com.ecommerce.controller.admin;
 
-import com.ecommerce.dto.filter.OrderFilter;
-import com.ecommerce.dto.request.RefundRequest;
 import com.ecommerce.dto.request.UpdateOrderStatusRequest;
-import com.ecommerce.dto.request.UpdateShippingRequest;
 import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.dto.response.PageResponse;
 import com.ecommerce.service.OrderService;
 import com.ecommerce.service.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,22 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/orders")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class OrderAdminController {
 
     private final OrderService orderService;
     private final UserService userService;
-
-    @GetMapping
-    public ResponseEntity<PageResponse<OrderResponse>> getAllOrders(OrderFilter filter) {
-        return ResponseEntity.ok(orderService.getAllOrders(filter));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.getOrderByIdForAdmin(id));
-    }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
@@ -41,19 +28,9 @@ public class OrderAdminController {
             @Valid @RequestBody UpdateOrderStatusRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long adminId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.updateOrderStatus(id, adminId, request));
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, request.getNewStatus(), adminId));
     }
 
-    @PatchMapping("/{id}/manage")
-    public ResponseEntity<OrderResponse> manageOrder(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateOrderStatusRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long adminId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.manageOrder(id, adminId, request));
-    }
-
-    // JWT username = email → dùng UserService.findByEmail() để lấy id
     private Long getCurrentUserId(UserDetails userDetails) {
         return userService.findByEmail(userDetails.getUsername()).getId();
     }

@@ -9,7 +9,7 @@ public class RefundMapper {
 	        if (refund == null) return null;
 
 	        return RefundResponse.builder()
-	                .refundId(refund.getId())
+	                .refund(refund.getId())
 	                .amount(refund.getAmount())
 	                .reason(refund.getReason())
 	                .status(refund.getStatus())

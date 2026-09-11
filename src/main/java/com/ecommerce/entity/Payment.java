@@ -37,7 +37,7 @@ public class Payment {
 	private PaymentStatus status;
 	
 	@Column(name = "transaction_id")
-	private String transactionId;
+	private String transaction;
 	
 	@Column(name = "paid_at")
 	private LocalDateTime paidAt;

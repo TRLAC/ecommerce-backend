@@ -25,7 +25,7 @@ public class OrderItemMapper {
 
 	        return OrderItemResponse.builder()
 	                .orderItemId(item.getId())
-	                .productId(item.getProduct() != null ? item.getProduct().getProductId() : null)
+	                .productId(item.getProduct() != null ? item.getProduct().getId() : null)
 	                .productName(item.getProduct() != null ? item.getProduct().getName() : null)
 	                .productImageUrl(imageUrl)
 	                .quantity(item.getQuantity())

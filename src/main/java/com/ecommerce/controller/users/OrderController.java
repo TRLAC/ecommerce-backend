@@ -1,20 +1,26 @@
 package com.ecommerce.controller.users;
 
-import com.ecommerce.dto.filter.OrderFilter;
-import com.ecommerce.dto.request.CancelOrderRequest;
-import com.ecommerce.dto.request.PlaceOrderRequest;
-import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.dto.response.PageResponse;
-import com.ecommerce.service.OrderService;
-import com.ecommerce.service.UserService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.dto.request.PlaceOrderRequest;
+import com.ecommerce.dto.response.OrderResponse;
+import com.ecommerce.service.OrderService;
+import com.ecommerce.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -25,41 +31,35 @@ public class OrderController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<OrderResponse> placeOrder(
-            @Valid @RequestBody PlaceOrderRequest request,
+    public ResponseEntity<OrderResponse> createOrder(
+    		@Valid @RequestBody PlaceOrderRequest  request,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = getCurrentUserId(userDetails);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.placeOrder(userId, request));
+                .body(orderService.createOrderFromCart(userId, request.getPaymentMethod()));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<OrderResponse>> getMyOrders(
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getCurrentUserId(userDetails);
+        return ResponseEntity.ok(orderService.getOrderByUser(userId, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> viewOrder(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.viewOrder(id, userId));
-    }
-
-    @GetMapping("/my")
-    public ResponseEntity<PageResponse<OrderResponse>> getMyOrders(
-            OrderFilter filter,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = getCurrentUserId(userDetails);
-        return ResponseEntity.ok(orderService.getMyOrders(userId, filter));
+    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderDetail(id));
     }
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(
             @PathVariable Long id,
-            @RequestBody(required = false) CancelOrderRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = getCurrentUserId(userDetails);
-        if (request == null) request = new CancelOrderRequest();
-        return ResponseEntity.ok(orderService.cancelOrder(id, userId, request));
+        return ResponseEntity.ok(orderService.cancelOrder(id, userId));
     }
 
-    // JWT username = email → dùng UserService.findByEmail() để lấy id
     private Long getCurrentUserId(UserDetails userDetails) {
         return userService.findByEmail(userDetails.getUsername()).getId();
     }

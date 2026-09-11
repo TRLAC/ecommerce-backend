@@ -24,7 +24,7 @@ public class BrandServiceImpl implements BrandService {
  public List<BrandResponse> getAll() {
      return brandRepository.findAll(Sort.by("brandName"))
              .stream()
-             .map(b -> new BrandResponse(b.getBrandId(), b.getBrandName()))
+             .map(b -> new BrandResponse(b.getId(), b.getBrandName()))
              .toList();
  }
 
@@ -32,6 +32,6 @@ public class BrandServiceImpl implements BrandService {
  public BrandResponse getById(Long id) {
      Brand brand = brandRepository.findById(id)
              .orElseThrow(() -> new ResourceNotFoundException("Brand not found: " + id));
-     return new BrandResponse(brand.getBrandId(), brand.getBrandName());
+     return new BrandResponse(brand.getId(), brand.getBrandName());
  }
 }

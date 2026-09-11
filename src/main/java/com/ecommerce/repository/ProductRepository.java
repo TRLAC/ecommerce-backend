@@ -22,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 			    UPDATE Product p
 			    SET p.stockQuantity =
 			        p.stockQuantity - :qty
-			    WHERE p.productId = :productId
+			    WHERE p.id = :productId
 			    AND p.stockQuantity >= :qty
 			""")
 	int deductStock(@Param("productId") Long productId,
@@ -35,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 			    UPDATE Product p
 			    SET p.stockQuantity =
 			        p.stockQuantity + :qty
-			    WHERE p.productId = :productId
+			    WHERE p.id = :productId
 			""")
 	void restoreStock(@Param("productId") Long productId,
 

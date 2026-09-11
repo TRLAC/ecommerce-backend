@@ -76,7 +76,7 @@ public class CategoryService {
             // Check circular reference
             Category current = parent;
             while (current != null) {
-                if (current.getCategoryId().equals(id)) {
+                if (current.getId().equals(id)) {
                     throw new RuntimeException("Cannot set a child as parent (circular reference)");
                 }
                 current = current.getParent();

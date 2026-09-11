@@ -5,18 +5,15 @@ import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CartItemResponse {
 	private Long cartItemId;
     private Long productId;
-    private String productName;
     private String productImageUrl;
     private BigDecimal productPrice;
     private String productBrand;
