@@ -32,3 +32,4 @@ replay_pid*
 target/classes/META-INF/MANIFEST.MF
 target/classes/META-INF/maven/ecommerce/ecommerce/pom.xml
 target/classes/application.properties
+/.metadata/

@@ -44,16 +44,16 @@ public class ProductSpecification {
 			    predicates.add(
 			        cb.or(
 			            // Đúng category đó
-			            cb.equal(root.get("category").get("categoryId"), filter.getCategoryId()),
+			            cb.equal(root.get("category").get("id"), filter.getCategoryId()),
 			            // Hoặc con của category đó
-			            cb.equal(root.get("category").get("parent").get("categoryId"), filter.getCategoryId())
+			            cb.equal(root.get("category").get("parent").get("id"), filter.getCategoryId())
 			        )
 			    );
 			}
 
 			if (filter.getBrandId() != null) {
 
-				predicates.add(cb.equal(root.get("brand").get("brandId"), filter.getBrandId()));
+				predicates.add(cb.equal(root.get("brand").get("id"), filter.getBrandId()));
 
 			}
 
