@@ -48,8 +48,9 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.getOrderDetail(id));
+    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable Long id,  @AuthenticationPrincipal UserDetails userDetails) {
+    	 Long userId = getCurrentUserId(userDetails);
+        return ResponseEntity.ok(orderService.getOrderDetail(id, userId));
     }
 
     @PatchMapping("/{id}/cancel")

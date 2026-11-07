@@ -115,8 +115,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderResponse getOrderDetail(Long id) {
-		Order order = orderRepository.findByIdWithDetails(id)
+	public OrderResponse getOrderDetail(Long id, Long userId) {
+		Order order = orderRepository.findByIdAndUser_Id(id,userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
 		return orderMapper.toOrderResponse(order);
 	}

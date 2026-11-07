@@ -163,7 +163,7 @@ public class ProductService {
 
 	        for (MultipartFile file : files) {
 
-	            String url = fileStorageService.save(file);
+	        	String url = fileStorageService.save(file, FileStorageService.PRODUCTS);
 
 	            ProductImage image = new ProductImage();
 	            image.setProduct(product);

@@ -12,7 +12,7 @@ public interface OrderService {
 	
 	Page<OrderResponse> getOrderByUser(Long userId, Pageable pageable);
 	
-	OrderResponse getOrderDetail(Long id);
+	OrderResponse getOrderDetail(Long id, Long userId);
 	
 	OrderResponse cancelOrder(Long id, Long userId);
 	

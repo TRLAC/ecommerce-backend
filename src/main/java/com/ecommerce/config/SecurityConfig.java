@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.ecommerce.security.JwtAuthenticationEntryPoint;
 import com.ecommerce.security.JwtAuthenticationFilter;
 
 @Configuration
@@ -24,9 +25,12 @@ import com.ecommerce.security.JwtAuthenticationFilter;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint entryPoint; 
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter,
+    					JwtAuthenticationEntryPoint entryPoint) {
         this.jwtFilter = jwtFilter;
+        this.entryPoint = entryPoint;  
     }
 
     @Bean
@@ -53,9 +57,7 @@ public class SecurityConfig {
                 		"/uploads/**",
                 	    "/api/products/**",
                 	    "/api/brands/**",
-                	    "/api/categories/**",
-                	    "/api/orders/**",
-                	    "/api/payments/**"
+                	    "/api/categories/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")

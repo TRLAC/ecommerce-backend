@@ -87,10 +87,10 @@ public class UserService {
 	    }
 
 	    if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
-            fileStorageService.delete(user.getAvatar()); // ✅ xóa ảnh cũ
-            String fileName = fileStorageService.save(request.getAvatar()); // ✅ lưu file thật
-            user.setAvatar(fileName);
-        }
+	        fileStorageService.delete(user.getAvatar(), FileStorageService.AVATARS);
+	        String fileName = fileStorageService.save(request.getAvatar(), FileStorageService.AVATARS);
+	        user.setAvatar(fileName);
+	    }
 
 	    User savedUser = userRepository.save(user);
 
