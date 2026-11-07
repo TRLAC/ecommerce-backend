@@ -23,7 +23,7 @@ import com.ecommerce.repository.BrandRepository;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.ProductImageRepository;
 import com.ecommerce.repository.ProductRepository;
-import com.ecommerce.specification.ProductSpecification;
+import com.ecommerce.repository.ProductSpecification;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

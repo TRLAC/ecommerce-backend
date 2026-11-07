@@ -1,8 +1,11 @@
 package com.ecommerce.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.ShippingResponse;
 import com.ecommerce.entity.Shipping;
 
+@Component
 public class ShippingMapper {
 
 	public ShippingResponse toShippingResponse(Shipping shipping) {

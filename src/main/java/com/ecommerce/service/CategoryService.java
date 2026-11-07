@@ -43,6 +43,7 @@ public class CategoryService {
 
         Category category = new Category();
         category.setCategoryName(request.getName().trim());
+        category.setStatus(CategoryStatus.ACTIVE);
 
         if (request.getParentId() != null) {
 
@@ -110,7 +111,6 @@ public class CategoryService {
                 .findAllWithFilter(
                     filter.getKeyword(),
                     filter.getStatus(),
-                    filter.getParentId() != null ? filter.getParentId() : -1L,
                     pageable
                 )
                 .map(CategoryMapper::toResponse);

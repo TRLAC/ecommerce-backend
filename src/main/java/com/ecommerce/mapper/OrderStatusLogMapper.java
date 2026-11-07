@@ -4,9 +4,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.OrderStatusLogResponse;
 import com.ecommerce.entity.OrderStatusLog;
 
+@Component
 public class OrderStatusLogMapper {
 
     public OrderStatusLogResponse toStatusLogResponse(OrderStatusLog log) {

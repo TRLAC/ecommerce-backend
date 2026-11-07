@@ -4,10 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.OrderItemResponse;
 import com.ecommerce.entity.OrderItem;
 import com.ecommerce.entity.Product;
 
+@Component
 public class OrderItemMapper {
 
 	  public OrderItemResponse toOrderItemResponse(OrderItem item) {

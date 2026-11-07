@@ -73,7 +73,9 @@ public class OrderServiceImpl implements OrderService {
 		
 		for(OrderItem item : orderItems) {
 			productService.deductStock(item.getProduct().getId(), item.getQuantity());
+			
 		}
+		
 		
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -84,6 +86,11 @@ public class OrderServiceImpl implements OrderService {
 		        .status(OrderStatus.PENDING)
 		        .orderItems(orderItems)
 		        .build();
+		
+	
+		for (OrderItem item : orderItems) {
+			   item.setOrder(order);
+		}
 		
 		Payment payment = Payment.builder()
 				.order(order)
@@ -124,10 +131,16 @@ public class OrderServiceImpl implements OrderService {
 			throw new BadRequestException("Cannot cancel order with current status: " + order.getStatus());
 		}
 		
-		for (OrderItem item : order.getOrderItems()) {
-		    productService.restoreStock(item.getProduct().getId(), item.getQuantity());
-		}
+		restoreStockForOrder(order);
 		
+		OrderStatusLog statusLog = OrderStatusLog.builder()
+				.order(order)
+				.oldStatus(order.getStatus())
+				.newStatus(OrderStatus.CANCELLED)
+				.changedBy(order.getUser())
+				.build();
+		
+		orderStatusLogRepository.save(statusLog);
 		order.setStatus(OrderStatus.CANCELLED);
 		orderRepository.save(order);
 		return orderMapper.toOrderResponse(order);
@@ -145,18 +158,27 @@ public class OrderServiceImpl implements OrderService {
 		User admin = userRepository.findById(adminId)
 	            .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + adminId));
 		
-		OrderStatusLog log = OrderStatusLog.builder()
+		OrderStatusLog statusLog = OrderStatusLog.builder()
 	            .order(order)
 	            .oldStatus(order.getStatus())
 	            .newStatus(newStatus)
 	            .changedBy(admin)
 	            .build();
 		
-		orderStatusLogRepository.save(log);
+		if (newStatus == OrderStatus.CANCELLED ) {   // newStatus có phải CANCELLED không
+		    restoreStockForOrder(order);
+		}
 		
+		orderStatusLogRepository.save(statusLog);
 		order.setStatus(newStatus);
 		orderRepository.save(order);
 		
 		return orderMapper.toOrderResponse(order);
+	}
+	
+	private void restoreStockForOrder(Order order) {
+		for(OrderItem item : order.getOrderItems()) {
+			productService.restoreStock(item.getProduct().getId(), item.getQuantity());
+		}
 	}
 }

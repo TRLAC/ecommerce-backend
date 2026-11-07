@@ -1,5 +1,7 @@
 package com.ecommerce.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.CategoryResponse;
 import com.ecommerce.entity.Category;
 

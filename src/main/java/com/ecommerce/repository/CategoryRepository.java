@@ -23,7 +23,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
         Page<Category> findAllWithFilter(
                 @Param("name") String name,
                 @Param("status") CategoryStatus status,
-                @Param("parentId") Long parentId,
                 Pageable pageable
         );
 }

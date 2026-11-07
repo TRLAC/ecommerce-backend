@@ -1,4 +1,4 @@
-package com.ecommerce.specification;
+package com.ecommerce.repository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,11 @@
 package com.ecommerce.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.RefundResponse;
 import com.ecommerce.entity.Refund;
 
+@Component
 public class RefundMapper {
 
 	  public RefundResponse toRefundResponse(Refund refund) {

@@ -87,7 +87,7 @@ public class CartService {
         item.setQuantity(request.getQuantity());
         cartItemRepository.save(item);
 
-        Cart cart = cartRepository.findByIdWithItems(item.getId())
+        Cart cart = cartRepository.findByIdWithItems(item.getCart().getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng"));
 
         return cartMapper.toCartResponse(cart);
