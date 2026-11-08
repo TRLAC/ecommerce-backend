@@ -22,7 +22,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             SELECT o FROM Order o
             LEFT JOIN FETCH o.orderItems oi
             LEFT JOIN FETCH oi.product
-            LEFT JOIN FETCH o.payment
             LEFT JOIN FETCH o.shipping
             WHERE o.id = :orderId
             """)
@@ -32,7 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             SELECT o FROM Order o
             LEFT JOIN FETCH o.orderItems oi
             LEFT JOIN FETCH oi.product
-            LEFT JOIN FETCH o.payment
             LEFT JOIN FETCH o.shipping
             WHERE o.id = :orderId AND o.user.id = :userId
             """)

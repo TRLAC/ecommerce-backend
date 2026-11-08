@@ -56,24 +56,17 @@ public class ProductService {
 	
 	@Transactional
 	public void deductStock(Long productId, int qty) {
-
-	    Product product = productRepository.findById(productId)
-	            .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
-
-	    if (product.getStockQuantity() < qty) {
+	    int updated = productRepository.deductStock(productId, qty);
+	    if (updated == 0) {
+	        // Không trừ được: hoặc sản phẩm không tồn tại (404), hoặc không đủ hàng (400)
+	        Product product = findById(productId);
 	        throw new BadRequestException("Insufficient stock for product: " + product.getName());
 	    }
-
-	    product.setStockQuantity(product.getStockQuantity() - qty);
 	}
-	
+
 	@Transactional
 	public void restoreStock(Long productId, int qty) {
-
-	    Product product = productRepository.findById(productId)
-	            .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
-
-	    product.setStockQuantity(product.getStockQuantity() + qty);
+	    productRepository.restoreStock(productId, qty);
 	}
 	
 	@Transactional

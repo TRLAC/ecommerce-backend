@@ -36,7 +36,7 @@ public class OrderController {
             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = getCurrentUserId(userDetails);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.createOrderFromCart(userId, request.getPaymentMethod()));
+        		.body(orderService.createOrderFromCart(userId, request.getPaymentMethod(), request.getAddress()));
     }
 
     @GetMapping

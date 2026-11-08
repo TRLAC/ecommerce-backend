@@ -8,7 +8,7 @@ import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.enums.PaymentMethod;
 
 public interface OrderService {
-	OrderResponse createOrderFromCart (Long userId, PaymentMethod paymentMethod);
+	OrderResponse createOrderFromCart(Long userId, PaymentMethod paymentMethod, String address);
 	
 	Page<OrderResponse> getOrderByUser(Long userId, Pageable pageable);
 	

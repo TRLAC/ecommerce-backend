@@ -1,6 +1,7 @@
 package com.ecommerce.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +17,12 @@ import com.ecommerce.entity.Order;
 import com.ecommerce.entity.OrderItem;
 import com.ecommerce.entity.OrderStatusLog;
 import com.ecommerce.entity.Payment;
+import com.ecommerce.entity.Shipping;
 import com.ecommerce.entity.User;
 import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.enums.PaymentMethod;
 import com.ecommerce.enums.PaymentStatus;
+import com.ecommerce.enums.ShippingStatus;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.mapper.OrderMapper;
@@ -30,6 +33,7 @@ import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.OrderService;
 import com.ecommerce.service.ProductService;
 import com.ecommerce.utils.OrderStatusTransition;
+import com.ecommerce.utils.PaymentStatusTransition;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     
 	@Override
-	public OrderResponse createOrderFromCart(Long userId, PaymentMethod paymentMethod) {
+	public OrderResponse createOrderFromCart(Long userId, PaymentMethod paymentMethod, String address) {
 		Cart cart = cartRepository.findByUserIdWithItems(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Cart not found for user id: " + userId));
 		
@@ -80,6 +84,11 @@ public class OrderServiceImpl implements OrderService {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 		
+		String shippingAddress = (address != null && !address.isBlank()) ? address.trim() : user.getAddress();
+		if (shippingAddress == null || shippingAddress.isBlank()) {
+		    throw new BadRequestException("Shipping address is required");
+		}
+		
 		Order order = Order.builder()
 		        .user(user)
 		        .totalAmount(totalAmount)
@@ -99,7 +108,22 @@ public class OrderServiceImpl implements OrderService {
 				.status(PaymentStatus.PENDING)
 				.build();
 		
-		order.setPayment(payment);
+		order.addPayment(payment);
+		
+		Shipping shipping = Shipping.builder()
+		        .order(order)
+		        .address(shippingAddress)
+		        .shippingStatus(ShippingStatus.PENDING)
+		        .build();
+		order.setShipping(shipping);
+		
+		OrderStatusLog initialLog = OrderStatusLog.builder()
+		        .order(order)
+		        .newStatus(OrderStatus.PENDING)
+		        .changedBy(user)
+		        .build();
+		order.setStatusLogs(new ArrayList<>(List.of(initialLog)));
+		
 		orderRepository.save(order);
 		
 		cart.getItems().clear();
@@ -126,12 +150,13 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findByIdAndUser_Id(id, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
 		 
-		PaymentMethod method = order.getPayment().getMethod();
+		PaymentMethod method = order.getLatestPayment().getMethod();
 		if(!OrderStatusTransition.canTransition(method, order.getStatus(), OrderStatus.CANCELLED)) {
 			throw new BadRequestException("Cannot cancel order with current status: " + order.getStatus());
 		}
 		
 		restoreStockForOrder(order);
+		cancelPendingPayments(order);
 		
 		OrderStatusLog statusLog = OrderStatusLog.builder()
 				.order(order)
@@ -150,9 +175,22 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus, Long adminId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
-		PaymentMethod method = order.getPayment().getMethod();
+		PaymentMethod method = order.getLatestPayment().getMethod();
 		if(!OrderStatusTransition.canTransition(method, order.getStatus(), newStatus)) {
 			throw new BadRequestException("Cannot change order status from " + order.getStatus() + " to " + newStatus);
+		}
+		
+			if (newStatus == OrderStatus.PAID) {
+		    if (method != PaymentMethod.COD) {
+		        throw new BadRequestException("Online orders become PAID only through payment confirmation");
+		    }
+		    
+		    // COD: khách trả tiền mặt khi nhận hàng -> payment thành công
+		    Payment payment = order.getLatestPayment();
+		    if (PaymentStatusTransition.canTransition(payment.getStatus(), PaymentStatus.SUCCESS)) {
+		        payment.setStatus(PaymentStatus.SUCCESS);
+		        payment.setPaidAt(LocalDateTime.now());
+		    }
 		}
 		
 		User admin = userRepository.findById(adminId)
@@ -165,9 +203,10 @@ public class OrderServiceImpl implements OrderService {
 	            .changedBy(admin)
 	            .build();
 		
-		if (newStatus == OrderStatus.CANCELLED ) {   // newStatus có phải CANCELLED không
-		    restoreStockForOrder(order);
-		}
+		  if (newStatus == OrderStatus.CANCELLED) {
+		        restoreStockForOrder(order);
+		        cancelPendingPayments(order);
+		    }
 		
 		orderStatusLogRepository.save(statusLog);
 		order.setStatus(newStatus);
@@ -180,5 +219,13 @@ public class OrderServiceImpl implements OrderService {
 		for(OrderItem item : order.getOrderItems()) {
 			productService.restoreStock(item.getProduct().getId(), item.getQuantity());
 		}
+	}
+	
+	private void cancelPendingPayments(Order order) {
+	    for (Payment payment : order.getPayments()) {
+	        if (PaymentStatusTransition.canTransition(payment.getStatus(), PaymentStatus.CANCELLED)) {
+	            payment.setStatus(PaymentStatus.CANCELLED);
+	        }
+	    }
 	}
 }

@@ -1,8 +1,8 @@
 package com.ecommerce.service;
 
 import com.ecommerce.dto.request.UpdateShippingRequest;
+import com.ecommerce.dto.response.ShippingResponse;
 
 public interface ShippingService {
-    void createShipping(Long orderId, String address);
-    void updateShipping(UpdateShippingRequest request);
+    ShippingResponse updateShipping(Long orderId, Long adminId, UpdateShippingRequest request);
 }

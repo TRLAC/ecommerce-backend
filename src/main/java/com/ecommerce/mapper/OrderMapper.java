@@ -1,5 +1,7 @@
 package com.ecommerce.mapper;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.ecommerce.dto.response.OrderResponse;
@@ -10,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class OrderMapper {
-	
-	  private final OrderItemMapper orderItemMapper;
-	    private final PaymentMapper paymentMapper;
-	    private final ShippingMapper shippingMapper;
-	    private final OrderStatusLogMapper orderStatusLogMapper;
+
+    private final OrderItemMapper orderItemMapper;
+    private final PaymentMapper paymentMapper;
+    private final ShippingMapper shippingMapper;
+    private final OrderStatusLogMapper orderStatusLogMapper;
 
     public OrderResponse toOrderResponse(Order order) {
         if (order == null) return null;
@@ -28,17 +30,14 @@ public class OrderMapper {
                 .status(order.getStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
-                
-                .items(orderItemMapper.toOrderItemResponseList(
-                        order.getOrderItems()))
-                .payment(paymentMapper.toPaymentResponse(
-                        order.getPayment()))
-
-                .shipping(shippingMapper.toShippingResponse(
-                        order.getShipping()))
-
-                .statusLogs(orderStatusLogMapper.toStatusLogResponseList(
-                        order.getStatusLogs()))
+                .items(orderItemMapper.toOrderItemResponseList(order.getOrderItems()))
+                .payments(order.getPayments() == null
+                        ? List.of()
+                        : order.getPayments().stream()
+                                .map(paymentMapper::toPaymentResponse)
+                                .toList())
+                .shipping(shippingMapper.toShippingResponse(order.getShipping()))
+                .statusLogs(orderStatusLogMapper.toStatusLogResponseList(order.getStatusLogs()))
                 .build();
     }
 }

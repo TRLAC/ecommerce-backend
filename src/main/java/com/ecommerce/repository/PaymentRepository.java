@@ -11,14 +11,16 @@ import com.ecommerce.enums.PaymentStatus;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-
-    Optional<Payment> findByOrderId(Long orderId);
-
-    Optional<Payment> findByTransaction(String transactionId);
-
-    boolean existsByOrderIdAndStatus(Long orderId, PaymentStatus status);
-    
-    Optional<Payment> findByOrderIdAndStatus(Long orderId, PaymentStatus status);
-    
-    boolean existsByOrderIdAndStatusIn(Long orderId, List<PaymentStatus> statuses);
-}
+	
+		List<Payment> findByOrderId(Long orderId);
+	
+		Optional<Payment> findFirstByOrderIdOrderByIdDesc(Long orderId);
+		    
+	    Optional<Payment> findByTransaction(String transactionId);
+	
+	    boolean existsByOrderIdAndStatus(Long orderId, PaymentStatus status);
+	    
+	    Optional<Payment> findByOrderIdAndStatus(Long orderId, PaymentStatus status);
+	    
+	    boolean existsByOrderIdAndStatusIn(Long orderId, List<PaymentStatus> statuses);
+	}

@@ -9,7 +9,7 @@ public class PaymentStatusTransition {
 	private PaymentStatusTransition() {};
 	
 	private static final Map<PaymentStatus, Set<PaymentStatus>> PAYMENT_TRANSITION = Map.of(
-			PaymentStatus.PENDING, Set.of(PaymentStatus.SUCCESS, PaymentStatus.FAILED),
+			PaymentStatus.PENDING, Set.of(PaymentStatus.SUCCESS, PaymentStatus.FAILED,  PaymentStatus.CANCELLED),
 			PaymentStatus.SUCCESS, Set.of(PaymentStatus.REFUNDED)
 			);
 	

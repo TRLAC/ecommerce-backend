@@ -26,7 +26,7 @@ public class OrderResponse {
 	    private LocalDateTime createdAt;
 	    private LocalDateTime updatedAt;
 	    private List<OrderItemResponse> items;
-	    private PaymentResponse payment;
+	    private List<PaymentResponse> payments;
 	    private ShippingResponse shipping;
 	    private List<OrderStatusLogResponse> statusLogs;
 }
