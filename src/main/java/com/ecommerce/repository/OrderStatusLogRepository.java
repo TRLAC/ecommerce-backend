@@ -1,10 +1,11 @@
 package com.ecommerce.repository;
 
-import com.ecommerce.entity.OrderStatusLog;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.ecommerce.entity.OrderStatusLog;
 
 @Repository
 public interface OrderStatusLogRepository extends JpaRepository<OrderStatusLog, Long> {

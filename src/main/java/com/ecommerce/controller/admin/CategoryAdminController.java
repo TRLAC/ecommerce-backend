@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.dto.request.CreateCategoryRequest;
 import com.ecommerce.dto.request.UpdateCategoryRequest;
 import com.ecommerce.dto.response.CategoryResponse;
-import com.ecommerce.service.CategoryService;
+import com.ecommerce.service.impl.CategoryServiceImpl;
 
 import jakarta.validation.Valid;
 
@@ -25,9 +25,9 @@ import jakarta.validation.Valid;
 @PreAuthorize("hasRole('ADMIN')")
 public class CategoryAdminController {
 
-    private final CategoryService categoryService;
+    private final CategoryServiceImpl categoryService;
 
-    public CategoryAdminController(CategoryService categoryService) {
+    public CategoryAdminController(CategoryServiceImpl categoryService) {
         this.categoryService = categoryService;
     }
     

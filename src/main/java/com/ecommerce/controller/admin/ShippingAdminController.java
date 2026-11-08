@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.dto.request.UpdateShippingRequest;
 import com.ecommerce.dto.response.ShippingResponse;
 import com.ecommerce.service.ShippingService;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ShippingAdminController {
 
     private final ShippingService shippingService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PatchMapping("/{orderId}/shipping")
     public ResponseEntity<ShippingResponse> updateShipping(

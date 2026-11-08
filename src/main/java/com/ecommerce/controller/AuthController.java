@@ -23,8 +23,8 @@ import com.ecommerce.entity.User;
 import com.ecommerce.mapper.ProfileMapper;
 import com.ecommerce.security.CustomUserDetails;
 import com.ecommerce.security.JwtUtil;
-import com.ecommerce.service.RefreshTokenService;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.RefreshTokenServiceImpl;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,16 +36,16 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final JwtUtil jwtUtil;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenService;
     private final ProfileMapper profileMapper; 
 
     public AuthController(
             AuthenticationManager authenticationManager,
-            UserService userService,
+            UserServiceImpl userService,
             JwtUtil jwtUtil,
-            RefreshTokenService refreshTokenService,
+            RefreshTokenServiceImpl refreshTokenService,
             ProfileMapper profileMapper
     ) {
         this.authenticationManager = authenticationManager;

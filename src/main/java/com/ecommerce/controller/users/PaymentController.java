@@ -13,7 +13,7 @@ import com.ecommerce.dto.request.ConfirmPaymentRequest;
 import com.ecommerce.dto.response.PaymentResponse;
 import com.ecommerce.enums.PaymentMethod;
 import com.ecommerce.service.PaymentService;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     // Tạo (hoặc thử lại) thanh toán cho đơn
     @PostMapping("/{orderId}")

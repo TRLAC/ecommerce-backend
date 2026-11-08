@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecommerce.dto.request.CreateProductRequest;
 import com.ecommerce.dto.request.UpdateProductRequest;
 import com.ecommerce.dto.response.ProductResponse;
-import com.ecommerce.service.ProductService;
+import com.ecommerce.service.impl.ProductServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @PreAuthorize("hasRole('ADMIN')")
 public class ProductAdminController {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
   
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {

@@ -22,7 +22,6 @@ import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.OrderStatusLogRepository;
 import com.ecommerce.repository.RefundRepository;
 import com.ecommerce.repository.UserRepository;
-import com.ecommerce.service.ProductService;
 import com.ecommerce.service.RefundService;
 import com.ecommerce.utils.OrderStatusTransition;
 import com.ecommerce.utils.PaymentStatusTransition;
@@ -41,7 +40,7 @@ public class RefundServiceImpl implements RefundService {
     private final OrderRepository orderRepository;
     private final OrderStatusLogRepository orderStatusLogRepository;
     private final UserRepository userRepository;
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
     private final RefundMapper refundMapper;
 
     @Override

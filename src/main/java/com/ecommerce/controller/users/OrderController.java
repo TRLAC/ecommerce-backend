@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.dto.request.PlaceOrderRequest;
 import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.service.OrderService;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
     private final OrderService orderService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(

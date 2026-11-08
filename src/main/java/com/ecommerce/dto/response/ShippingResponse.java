@@ -1,10 +1,11 @@
 package com.ecommerce.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.ecommerce.enums.ShippingStatus;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

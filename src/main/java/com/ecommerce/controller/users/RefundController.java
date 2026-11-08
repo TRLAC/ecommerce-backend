@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.dto.request.RefundRequest;
 import com.ecommerce.dto.response.RefundResponse;
 import com.ecommerce.service.RefundService;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class RefundController {
 
     private final RefundService refundService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping("/orders/{orderId}")
     public ResponseEntity<RefundResponse> requestRefund(

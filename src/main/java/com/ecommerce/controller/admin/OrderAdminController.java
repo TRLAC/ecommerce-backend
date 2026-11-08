@@ -1,17 +1,22 @@
 package com.ecommerce.controller.admin;
 
-import com.ecommerce.dto.request.UpdateOrderStatusRequest;
-import com.ecommerce.dto.response.OrderResponse;
-import com.ecommerce.service.OrderService;
-import com.ecommerce.service.UserService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.dto.request.UpdateOrderStatusRequest;
+import com.ecommerce.dto.response.OrderResponse;
+import com.ecommerce.service.OrderService;
+import com.ecommerce.service.impl.UserServiceImpl;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/orders")
@@ -20,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderAdminController {
 
     private final OrderService orderService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(

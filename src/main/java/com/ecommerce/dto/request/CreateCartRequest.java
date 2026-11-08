@@ -1,12 +1,5 @@
 package com.ecommerce.dto.request;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.ecommerce.dto.response.CartItemResponse;
-import com.ecommerce.dto.response.CartResponse;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,5 @@
 package com.ecommerce.controller.users;
 
-import java.security.Principal;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +16,7 @@ import com.ecommerce.dto.request.CreateCartRequest;
 import com.ecommerce.dto.request.UpdateCartItemRequest;
 import com.ecommerce.dto.response.CartResponse;
 import com.ecommerce.security.CustomUserDetails;
-import com.ecommerce.service.CartService;
+import com.ecommerce.service.impl.CartServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartController {
 
-    private final CartService cartService;
+    private final CartServiceImpl cartService;
     
     private Long getUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -2,8 +2,6 @@ package com.ecommerce.dto.response;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.ecommerce.entity.Brand;
-import com.ecommerce.entity.Category;
 import com.ecommerce.enums.ProductStatus;
 
 import lombok.Getter;

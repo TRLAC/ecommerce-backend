@@ -1,12 +1,16 @@
 package com.ecommerce.entity;
 
 import java.time.LocalDateTime;
+
 import org.hibernate.annotations.CreationTimestamp;
+
 import com.ecommerce.enums.OrderStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +36,7 @@ public class OrderStatusLog {
 	@Column(name = "log_id")
 	private Long id;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
 	private Order order;
 	
@@ -44,7 +48,7 @@ public class OrderStatusLog {
 	@Column(name = "new_status")
 	private OrderStatus newStatus;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "changed_by")
 	private User changedBy;	
 	

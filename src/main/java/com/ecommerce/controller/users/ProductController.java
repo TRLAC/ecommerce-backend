@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.filter.ProductFilter;
 import com.ecommerce.dto.response.ProductResponse;
-import com.ecommerce.service.ProductService;
+import com.ecommerce.service.impl.ProductServiceImpl;
 
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
     
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceImpl productService) {
         this.productService = productService;
     }
 

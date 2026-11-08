@@ -1,27 +1,24 @@
 package com.ecommerce.controller.users;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.request.UpdateProfileRequest;
 import com.ecommerce.dto.response.ProfileResponse;
-import com.ecommerce.service.UserService;
+import com.ecommerce.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/profile")
 public class ProfileController {
-	private final UserService userService;
+	private final UserServiceImpl userService;
 	
-	public ProfileController(UserService userService) {
+	public ProfileController(UserServiceImpl userService) {
 		this.userService = userService;
 	}
 	
