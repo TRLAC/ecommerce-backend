@@ -8,11 +8,14 @@ import lombok.Data;
 @Data
 public class UpdateProfileRequest {
 
-	 @Size(max = 100)
-	    private String fullName;
+    @Size(max = 100)
+    private String fullName;
 
-	    @Size(max = 15)
-	    private String phone;
+    @Size(max = 15)
+    private String phone;
 
-	    private MultipartFile avatar;
+    @Size(max = 255)
+    private String address;
+
+    private MultipartFile avatar;
 }

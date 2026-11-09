@@ -25,6 +25,7 @@ import com.ecommerce.entity.OrderItem;
 import com.ecommerce.entity.OrderStatusLog;
 import com.ecommerce.entity.Payment;
 import com.ecommerce.entity.Product;
+import com.ecommerce.entity.Shipping;
 import com.ecommerce.entity.User;
 import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.enums.PaymentMethod;
@@ -36,7 +37,6 @@ import com.ecommerce.repository.CartRepository;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.OrderStatusLogRepository;
 import com.ecommerce.repository.UserRepository;
-import com.ecommerce.service.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImTest {
@@ -143,5 +143,17 @@ class OrderServiceImTest {
                 () -> orderService.updateOrderStatus(5L, OrderStatus.PAID, 1L));
 
         assertEquals(OrderStatus.PENDING, order.getStatus());
+    }
+    
+    @Test
+    void updateOrderStatus_orderWithShipping_cannotBeMovedToShippedDirectly() {
+        Order order = buildOrder(PaymentMethod.VNPAY, OrderStatus.PROCESSING, PaymentStatus.SUCCESS);
+        order.setShipping(new Shipping());
+        when(orderRepository.findById(5L)).thenReturn(Optional.of(order));
+
+        assertThrows(BadRequestException.class,
+                () -> orderService.updateOrderStatus(5L, OrderStatus.SHIPPED, 1L));
+
+        assertEquals(OrderStatus.PROCESSING, order.getStatus());
     }
 }

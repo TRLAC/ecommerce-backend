@@ -2,6 +2,7 @@
 # Build
 # ===============================
 target/
+uploads/
 build/
 out/
 

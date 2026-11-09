@@ -17,6 +17,5 @@ public class CategoryFilter {
 
     private String keyword;           
     private CategoryStatus status;   
-    private Long parentId;
 
 }

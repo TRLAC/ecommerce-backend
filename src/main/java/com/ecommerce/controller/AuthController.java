@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ecommerce.config.JwtProperties;
 import com.ecommerce.dto.request.LoginRequest;
 import com.ecommerce.dto.request.RegisterRequest;
 import com.ecommerce.dto.response.AuthResponse;
@@ -39,20 +40,23 @@ public class AuthController {
     private final UserServiceImpl userService;
     private final JwtUtil jwtUtil;
     private final RefreshTokenServiceImpl refreshTokenService;
-    private final ProfileMapper profileMapper; 
+    private final ProfileMapper profileMapper;
+    private final JwtProperties jwtProperties;
 
     public AuthController(
             AuthenticationManager authenticationManager,
             UserServiceImpl userService,
             JwtUtil jwtUtil,
             RefreshTokenServiceImpl refreshTokenService,
-            ProfileMapper profileMapper
+            ProfileMapper profileMapper,
+            JwtProperties jwtProperties
     ) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.profileMapper = profileMapper;
+        this.jwtProperties = jwtProperties;
     }
     
     // ================= REGISTER =================
@@ -205,7 +209,7 @@ public class AuthController {
         cookie.setHttpOnly(true);
         cookie.setSecure(false); // dev
         cookie.setPath("/api");
-        cookie.setMaxAge(7 * 24 * 60 * 60);
+        cookie.setMaxAge((int) (jwtProperties.getRefreshExpiration() / 1000));
         response.addCookie(cookie);
     }
 

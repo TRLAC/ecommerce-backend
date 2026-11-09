@@ -38,6 +38,7 @@ public class ProductServiceImpl implements ProductService{
 	private final CategoryRepository categoryRepository;
 	private final FileStorageService fileStorageService;
 	private final ProductImageRepository productImageRepository;
+	private final ProductMapper productMapper;
 
 	@Transactional(readOnly = true)
 	public Product findById(Long id) {
@@ -94,7 +95,7 @@ public class ProductServiceImpl implements ProductService{
 	     
 	     Product saved = productRepository.save(product);
 	     
-	     return ProductMapper.toResponse(saved);
+	     return productMapper.toResponse(saved);
 	}
 	
 	@Transactional
@@ -148,7 +149,7 @@ public class ProductServiceImpl implements ProductService{
 	        );
 	    }
 	    
-		return ProductMapper.toResponse(product);
+		return productMapper.toResponse(product);
 	}
 	
 	@Transactional
@@ -187,7 +188,7 @@ public class ProductServiceImpl implements ProductService{
 								ProductSpecification.filter(filter),
 								pageable
 		      );
-		 return products.map(ProductMapper::toResponse);
+		 return products.map(productMapper::toResponse);
 	}
 	
 	@Transactional(readOnly = true)
@@ -207,7 +208,7 @@ public class ProductServiceImpl implements ProductService{
 
 	    }
 
-	    return ProductMapper.toResponse(product);
+	    return productMapper.toResponse(product);
 	}
 }
 

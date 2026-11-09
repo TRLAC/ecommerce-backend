@@ -151,6 +151,13 @@ public class OrderServiceImpl implements OrderService {
 		if (!OrderStatusTransition.canTransition(method, order.getStatus(), newStatus)) {
 			throw new BadRequestException("Cannot change order status from " + order.getStatus() + " to " + newStatus);
 		}
+		
+		if (order.getShipping() != null
+		        && (newStatus == OrderStatus.PROCESSING
+		            || newStatus == OrderStatus.SHIPPED
+		            || newStatus == OrderStatus.DELIVERED)) {
+		    throw new BadRequestException("Use the shipping endpoint to move this order to " + newStatus);
+		}
 
 		if (newStatus == OrderStatus.PAID) {
 			if (method != PaymentMethod.COD) {

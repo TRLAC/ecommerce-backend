@@ -1,12 +1,20 @@
 package com.ecommerce.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.ecommerce.dto.response.ProductResponse;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.ProductImage;
 
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
 public class ProductMapper {
 
-    public static ProductResponse toResponse(Product product) {
+    private final ImageUrlResolver imageUrlResolver;
+
+    public ProductResponse toResponse(Product product) {
 
         if (product == null) {
             return null;
@@ -34,11 +42,13 @@ public class ProductMapper {
         res.setStorage(product.getStorage());
         res.setBattery(product.getBattery());
         res.setScreenSize(product.getScreenSize());
+
         if (product.getImages() != null) {
-        	res.setImages(
+            res.setImages(
                     product.getImages()
                            .stream()
                            .map(ProductImage::getImageUrl)
+                           .map(imageUrlResolver::productImage)
                            .toList()
             );
         }

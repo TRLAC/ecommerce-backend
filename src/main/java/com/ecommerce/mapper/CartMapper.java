@@ -11,8 +11,13 @@ import com.ecommerce.dto.response.CartResponse;
 import com.ecommerce.entity.Cart;
 import com.ecommerce.entity.CartItem;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class CartMapper {
+	
+	private final ImageUrlResolver imageUrlResolver;
 
     public CartItemResponse toCartItemResponse(CartItem item) {
         if (item == null) return null;
@@ -22,7 +27,7 @@ public class CartMapper {
         BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(item.getQuantity()));
 
         String imageUrl = (item.getProduct().getImages() != null && !item.getProduct().getImages().isEmpty())
-                          ? item.getProduct().getImages().get(0).getImageUrl()
+        		? imageUrlResolver.productImage(item.getProduct().getImages().get(0).getImageUrl())
                           : null;
 
         return CartItemResponse.builder()

@@ -10,8 +10,13 @@ import com.ecommerce.dto.response.OrderItemResponse;
 import com.ecommerce.entity.OrderItem;
 import com.ecommerce.entity.Product;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class OrderItemMapper {
+	
+	private final ImageUrlResolver imageUrlResolver;
 
 	  public OrderItemResponse toOrderItemResponse(OrderItem item) {
 	        if (item == null) return null;
@@ -23,7 +28,7 @@ public class OrderItemMapper {
 	        if (product != null
 	                && product.getImages() != null
 	                && !product.getImages().isEmpty()) {
-	            imageUrl = product.getImages().get(0).getImageUrl();
+	        	imageUrl = imageUrlResolver.productImage(product.getImages().get(0).getImageUrl());
 	        }
 
 	        return OrderItemResponse.builder()

@@ -1,4 +1,6 @@
 package com.ecommerce.service.impl;
+
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -7,20 +9,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ecommerce.config.JwtProperties;
 import com.ecommerce.entity.RefreshToken;
 import com.ecommerce.entity.User;
 import com.ecommerce.repository.RefreshTokenRepository;
 import com.ecommerce.service.RefreshTokenService;
+
 @Service
 @Transactional
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
-    public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository) {
+    public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository,
+                                   JwtProperties jwtProperties) {
         this.refreshTokenRepository = refreshTokenRepository;
+        this.jwtProperties = jwtProperties;
     }
 
+    // Thời điểm hết hạn lấy từ jwt.refresh-expiration (mili giây)
+    private LocalDateTime newExpiry() {
+        return LocalDateTime.now().plus(Duration.ofMillis(jwtProperties.getRefreshExpiration()));
+    }
+
+    @Override
     public RefreshToken create(User user) {
 
         // chỉ giữ 1 token/user
@@ -29,13 +42,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken token = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(user)
-                .expiresAt(LocalDateTime.now().plusDays(7))
+                .expiresAt(newExpiry())
                 .revoked(false)
                 .build();
 
         return refreshTokenRepository.save(token);
     }
 
+    @Override
     public RefreshToken verify(String token) {
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
@@ -62,10 +76,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
     }
 
+    @Override
     public void delete(RefreshToken token) {
         refreshTokenRepository.delete(token);
     }
 
+    @Override
     public RefreshToken rotate(RefreshToken oldToken) {
         // 1. revoke token cũ
         oldToken.setRevoked(true);
@@ -75,10 +91,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken newToken = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(oldToken.getUser())
-                .expiresAt(LocalDateTime.now().plusDays(7))
+                .expiresAt(newExpiry())
                 .build();
 
         return refreshTokenRepository.save(newToken);
     }
-
 }

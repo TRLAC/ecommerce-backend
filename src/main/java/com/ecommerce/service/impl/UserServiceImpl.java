@@ -87,6 +87,10 @@ public class UserServiceImpl implements UserService{
 	    if (request.getPhone() != null) {
 	        user.setPhone(request.getPhone());
 	    }
+	    
+	    if (request.getAddress() != null) {
+	        user.setAddress(request.getAddress().trim());
+	    }
 
 	    if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
 	        fileStorageService.delete(user.getAvatar(), FileStorageService.AVATARS);
