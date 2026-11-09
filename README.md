@@ -1,179 +1,82 @@
-# 🛒 E-commerce Backend API
+# E-commerce Backend
 
-A RESTful backend system for an e-commerce application built with **Spring Boot**.
-This project provides APIs for managing users, products, carts, and orders.
+Backend cho shop điện tử (điện thoại, laptop), viết bằng **Spring Boot**.
+Dự án làm theo kiểu **monolith**, tập trung vào luồng **Đặt hàng → Thanh toán → Giao hàng → Hoàn tiền**.
 
----
+## Công nghệ
+- Java 17, Spring Boot 4.0.3, Maven
+- Spring Data JPA + SQL Server
+- Spring Security + JWT
+- JUnit 5, Mockito
 
-## 🚀 Key Features
+## Làm được gì
+- Đăng ký, đăng nhập, phân quyền (user / admin)
+- Xem sản phẩm, lọc, tìm kiếm, phân trang
+- Giỏ hàng và đặt hàng
+- Thanh toán online (cổng giả lập) hoặc COD
+- Giao hàng và hoàn tiền
+- Ghi lại lịch sử đổi trạng thái của đơn hàng
 
-* 🔐 JWT Authentication (Access + Refresh Token) & Authorization
-* 🔁 Refresh Token & Token Rotation
-* 👤 User management
-* 📦 Product CRUD (create, update, delete, search)
-* 🛒 Shopping cart
-* 📑 Order management
-* 📄 Pagination & filtering
+## Luồng đơn hàng
 
----
+**Thanh toán online:**
+```
+Đặt hàng (PENDING) → Thanh toán xong (PAID) → Đang xử lý → Đang giao → Đã giao
+```
 
-## 🛠️ Tech Stack
+**Thanh toán khi nhận hàng (COD):**
+```
+Đặt hàng (PENDING) → Xác nhận → Đang xử lý → Đang giao → Đã giao → Đã thu tiền (PAID)
+```
 
-* Java 17
-* Spring Boot
-* Spring Security
-* Spring Data JPA (Hibernate)
-* SQL Server
-* Maven
-* JWT (JSON Web Token)
+- Đơn còn `PENDING` thì hủy được.
+- Đơn online đã thanh toán (`PAID`) thì xin hoàn tiền được.
+- Một đơn có thể thanh toán nhiều lần (thử lại nếu lần trước thất bại), nhưng chỉ một lần thành công.
+- Trạng thái đơn hàng và trạng thái thanh toán được quản lý **riêng**.
 
----
+## Điểm nổi bật
+- **Chống bán quá số lượng:** trừ kho bằng một câu `UPDATE` có điều kiện.
+- **Chống xem đơn của người khác:** mọi truy vấn đơn hàng đều kèm id người dùng.
+- **Báo lỗi thống nhất:** một nơi xử lý lỗi, trả JSON rõ ràng (400, 401, 403, 404).
+- **Chuyển trạng thái an toàn:** mọi thay đổi đều qua kiểm tra hợp lệ và được ghi log.
 
-## 📁 Project Structure
+## Chạy dự án
 
-src/main/java/com/ecommerce
-* config
-* controller
-* dto/filter
-* dto/request
-* dto/response
-* entity
-* enums
-* exception
-* mapper
-* repository
-* security
-* service
+Cần: JDK 17, Maven, SQL Server.
 
----
+1. Tạo database `shop` và chạy file `schema.sql`.
+2. Đặt 3 biến môi trường:
+   - `DB_USERNAME`: tài khoản SQL Server
+   - `DB_PASSWORD`: mật khẩu SQL Server
+   - `JWT_SECRET`: chuỗi bí mật, dài ít nhất 32 ký tự
+3. Chạy lệnh:
+   ```
+   mvn spring-boot:run
+   ```
+   Ứng dụng chạy ở `http://localhost:8080`.
 
-## 🔑 API Endpoints
+Hai quyền `ROLE_USER` và `ROLE_ADMIN` được tạo tự động khi khởi động.
 
-### Auth
+## Chạy test
+```
+mvn test
+```
+Phần lớn test không cần database.
 
-* POST /api/auth/login
-* POST /api/auth/register
-* POST /api/auth/refresh
-* POST /api/auth/logout
+## API chính
 
-### Profile
+| Chức năng | Endpoint |
+|---|---|
+| Đăng ký / đăng nhập | `POST /api/auth/register`, `POST /api/auth/login` |
+| Xem sản phẩm | `GET /api/products` |
+| Giỏ hàng | `GET /api/cart`, `POST /api/cart/items` |
+| Đặt hàng | `POST /api/orders` |
+| Xem / hủy đơn | `GET /api/orders/{id}`, `PATCH /api/orders/{id}/cancel` |
+| Thanh toán | `POST /api/payments/{orderId}?method=...`, `POST /api/payments/confirm` |
+| Xin hoàn tiền | `POST /api/refunds/orders/{orderId}` |
+| Admin: đổi trạng thái đơn | `PATCH /api/admin/orders/{id}/status` |
+| Admin: cập nhật giao hàng | `PATCH /api/admin/orders/{id}/shipping` |
+| Admin: duyệt hoàn tiền | `PATCH /api/admin/refunds/{id}/status` |
 
-* GET /api/profile - getProfile
-* PUT /api/profile - updateProfile
-
-
-### Product
-**ADMIN**
-* POST /api/admin/products - createProduct
-* PUT /api/admin/products/{id} - updateProduct
-* POST /api/admin/products/{id}/image - uploadImage
-* PATCH /api/admin/products/{id}/hide - deleteProduct
-
-**USER**
-* GET  /api/products - getAll
-* GET  /api/products/search - searchProducts
-* GET  /api/products/{id} - getProductById
-
-### Cart
-**USER**
-* GET /api/cart - getCart
-* POST /api/cart/items - addToCart
-* PUT /api/cart/items/{cartItemId} - updateCartItem
-* DELETE /api/cart/items/{cartItemId} - removeCartItem
-* DELETE /api/cart - clearCart
-
-### Category
-**ADMIN**
-* GET /api/admin/categories - getRootCategories
-* GET /api/admin/categories/{id} - getCategoryById
-* POST /api/admin/categories - createCategory
-* PUT /api/admin/categories/{id} - updateCategory
-* PATCH /api/admin/categories/{id}/hide - deleteCategory
-
-**USER**
-* GET /api/categories/{id} - getCategoryById
-* GET /api/categories/roots - getRootCategories
-* GET /api/categories/search - searchCategories
-
-
-### Order
-
-**ADMIN**
-* GET /api/admin/orders - getAllOrders
-* GET /api/admin/orders/{id} - getOrderDetail
-* PATCH /api/admin/orders/{id}/status - updateOrderStatus
-
-**USER**
-* POST /api/orders - placeOrder
-* GET /api/orders/{id} - viewOrder
-* GET /api/orders/my - getMyOrders
-* PATCH /api/orders/{id}/cancel - cancelOrder
-
----
-
-## ⚙️ Setup & Run
-
-### 1. Clone project
-
-git clone https://github.com/TRLAC/ecommerce-backend.git
-
-cd ecommerce-backend
-
-### 2. Configure database
-
-Update in `application.properties`:
-
-* spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=shop;encrypt=true;trustServerCertificate=true
-* spring.datasource.username=YOUR_DB_USERNAME
-* spring.datasource.password=YOUR_DB_PASSWORD
-
-### 3. Run project
-
-* mvn spring-boot:run
-
----
-
-## 🔐 Authentication
-
-Use JWT access token in header:
-
-**Authorization**: Bearer your_token_here
-
-=> Access tokens are short-lived; refresh tokens are required to obtain new access tokens.
-
----
-
-## 📌 Future Improvements
-
-### 🔐 Authentication & Security
-* Improve refresh token management (expiration, multi-device support)
-
-### 🛒 Order & Business Logic
-* Complete order lifecycle (status, cancellation)
-* Add stock validation when placing orders
-
-### ⚡ Performance
-* Optimize database queries and pagination
-
-### 🧪 Testing
-* Add unit tests for service layer
-
-### 🚀 Deployment
-* Dockerize application
-
-### 💳 Payment
-* Integrate payment gateway (VNPay / Stripe)
-
----
-
-## 👨‍💻 Author
-
- **Lạc Quan**  
-* Backend Developer (Java | Spring Boot)  
-* GitHub: https://github.com/TRLAC
-
----
-
-## 📄 License
-
-MIT License
+## Ghi chú
+Cổng thanh toán là **giả lập**: gửi `"success": true` hoặc `false` ở bước xác nhận để mô phỏng kết quả.
