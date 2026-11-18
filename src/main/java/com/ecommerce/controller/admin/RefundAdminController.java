@@ -1,17 +1,25 @@
 package com.ecommerce.controller.admin;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.request.UpdateRefundStatusRequest;
+import com.ecommerce.dto.response.AdminRefundResponse;
 import com.ecommerce.dto.response.RefundResponse;
+import com.ecommerce.enums.RefundStatus;
 import com.ecommerce.service.RefundService;
 import com.ecommerce.service.impl.UserServiceImpl;
 
@@ -26,6 +34,14 @@ public class RefundAdminController {
 
     private final RefundService refundService;
     private final UserServiceImpl userService;
+
+    // GET /api/admin/refunds?status=PENDING&page=0&size=10
+    @GetMapping
+    public ResponseEntity<Page<AdminRefundResponse>> getRefunds(
+            @RequestParam(required = false) RefundStatus status,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(refundService.getRefunds(status, pageable));
+    }
 
     @PatchMapping("/{refundId}/status")
     public ResponseEntity<RefundResponse> updateRefundStatus(

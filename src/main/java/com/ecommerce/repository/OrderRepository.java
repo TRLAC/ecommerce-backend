@@ -1,5 +1,6 @@
 package com.ecommerce.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -38,4 +39,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     Optional<Order> findByIdAndUser_Id(@Param("orderId") Long orderId, @Param("userId") Long userId);
 
     boolean existsByIdAndUser_Id(Long id, Long userId);
+
+    @Query("SELECT o.status, COUNT(o) FROM Order o GROUP BY o.status")
+    List<Object[]> countGroupedByStatus();
 }

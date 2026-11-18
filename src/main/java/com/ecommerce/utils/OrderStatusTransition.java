@@ -33,4 +33,8 @@ public class OrderStatusTransition {
 		}
     }
 	
+	public static boolean canCancelOnReturn(OrderStatus from) {
+		return from == OrderStatus.SHIPPED;
+	}
+	
 }

@@ -71,7 +71,9 @@ public class CategoryServiceImpl implements CategoryService {
             category.setCategoryName(request.getName().trim());
         }
 
-        if (request.getParentId() != null) {
+        if (Boolean.TRUE.equals(request.getRemoveParent())) {
+            category.setParent(null);
+        } else if (request.getParentId() != null) {
             if (request.getParentId().equals(id)) {
                 throw new BadRequestException("Category cannot be parent of itself");
             }
@@ -88,6 +90,8 @@ public class CategoryServiceImpl implements CategoryService {
             }
             category.setParent(parent);
         }
+        
+        
 
         categoryRepository.save(category);
         return CategoryMapper.toResponse(category);
@@ -109,6 +113,15 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return categoryRepository.findByCategoryNameContainingIgnoreCase(keyword, pageable)
                 .map(CategoryMapper::toResponse);
+    }
+    
+    @Transactional
+    public void showCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        category.setStatus(CategoryStatus.ACTIVE);
+        categoryRepository.save(category);
     }
     
     @Transactional(readOnly = true)

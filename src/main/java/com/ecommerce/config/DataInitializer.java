@@ -29,4 +29,5 @@ public class DataInitializer {
 			roleRepository.save(adminRole);
 		}
 	}
+	
 }

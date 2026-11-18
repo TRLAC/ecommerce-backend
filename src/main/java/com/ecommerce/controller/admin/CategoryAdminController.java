@@ -56,6 +56,12 @@ public class CategoryAdminController {
         return ResponseEntity.ok().build();
     }
     
+    @PatchMapping("/{id}/show")
+    public ResponseEntity<Void> showCategory(@PathVariable Long id) {
+        categoryService.showCategory(id);
+        return ResponseEntity.ok().build();
+    }
+    
     @GetMapping
     public List<CategoryResponse> getRootCategories() {
         return categoryService.getRootCategories();

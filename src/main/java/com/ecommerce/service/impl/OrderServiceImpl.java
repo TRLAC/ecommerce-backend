@@ -8,7 +8,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ecommerce.dto.filter.OrderFilter;
 import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.entity.Cart;
 import com.ecommerce.entity.CartItem;
@@ -27,6 +29,7 @@ import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.mapper.OrderMapper;
 import com.ecommerce.repository.CartRepository;
 import com.ecommerce.repository.OrderRepository;
+import com.ecommerce.repository.OrderSpecification;
 import com.ecommerce.repository.OrderStatusLogRepository;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.OrderService;
@@ -37,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl implements OrderService {
 	private final OrderStatusLogRepository orderStatusLogRepository;
 	private final CartRepository cartRepository;
@@ -109,6 +113,22 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public Page<OrderResponse> getAllOrders(OrderFilter filter, Pageable pageable) {
+		return orderRepository.findAll(OrderSpecification.withFilter(filter), pageable)
+				.map(orderMapper::toOrderResponse);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public OrderResponse getOrderDetailForAdmin(Long id) {
+		Order order = orderRepository.findByIdWithDetails(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+		return orderMapper.toOrderResponse(order);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Page<OrderResponse> getOrderByUser(Long userId, Pageable pageable) {
 		Page<Order> orders = orderRepository.findByUser_Id(userId, pageable);
 		return orders.map(orderMapper::toOrderResponse);

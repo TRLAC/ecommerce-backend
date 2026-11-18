@@ -75,4 +75,23 @@ public class ProductSpecification {
 
 	}
 
+
+	// ADMIN: không ép status = ACTIVE, thấy cả sản phẩm đã ẩn
+	public static Specification<Product> adminFilter(String keyword, ProductStatus status) {
+
+		return (root, query, cb) -> {
+
+			List<Predicate> predicates = new ArrayList<>();
+
+			if (keyword != null && !keyword.isBlank()) {
+				predicates.add(cb.like(cb.lower(root.get("name")), "%" + keyword.trim().toLowerCase() + "%"));
+			}
+
+			if (status != null) {
+				predicates.add(cb.equal(root.get("status"), status));
+			}
+
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+	}
 }

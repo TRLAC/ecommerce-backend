@@ -210,9 +210,11 @@ public class ProductServiceImpl implements ProductService{
 
 	    return productMapper.toResponse(product);
 	}
+
+	@Transactional(readOnly = true)
+	public Page<ProductResponse> getAdminProducts(String keyword, ProductStatus status, Pageable pageable) {
+		return productRepository
+				.findAll(ProductSpecification.adminFilter(keyword, status), pageable)
+				.map(productMapper::toResponse);
+	}
 }
-
-	   
-
-
-

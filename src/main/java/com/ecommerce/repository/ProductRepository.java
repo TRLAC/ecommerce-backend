@@ -15,6 +15,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
 	Page<Product> findByStatus(ProductStatus status, Pageable pageable);
 
+	long countByStatusAndStockQuantityLessThanEqual(ProductStatus status, Integer stockQuantity);
+
 	@Modifying
 	@Query("""
 			    UPDATE Product p

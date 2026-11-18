@@ -1,10 +1,13 @@
 package com.ecommerce.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.dto.request.RefundRequest;
 import com.ecommerce.dto.request.UpdateRefundStatusRequest;
+import com.ecommerce.dto.response.AdminRefundResponse;
 import com.ecommerce.dto.response.RefundResponse;
 import com.ecommerce.entity.Order;
 import com.ecommerce.entity.OrderItem;
@@ -75,6 +78,21 @@ public class RefundServiceImpl implements RefundService {
     }
 
     @Override
+    public void createRefundForReturn(Payment payment) {
+        if (refundRepository.findByPaymentId(payment.getId()).isPresent()) {
+            return;
+        }
+        Refund refund = Refund.builder()
+                .payment(payment)
+                .amount(payment.getAmount())
+                .reason("Delivery failed, goods returned to warehouse")
+                .status(RefundStatus.PENDING)
+                .build();
+        payment.setRefund(refund);
+        refundRepository.save(refund);
+    }
+    
+    @Override
     public RefundResponse updateRefundStatus(Long refundId, Long adminId, UpdateRefundStatusRequest request) {
         Refund refund = refundRepository.findById(refundId)
                 .orElseThrow(() -> new ResourceNotFoundException("Refund not found with id: " + refundId));
@@ -92,31 +110,50 @@ public class RefundServiceImpl implements RefundService {
             if (!PaymentStatusTransition.canTransition(payment.getStatus(), PaymentStatus.REFUNDED)) {
                 throw new BadRequestException("Cannot refund payment with status: " + payment.getStatus());
             }
-            if (!OrderStatusTransition.canTransition(payment.getMethod(), order.getStatus(), OrderStatus.REFUNDED)) {
+            
+            // Đơn đã CANCELLED + payment SUCCESS = hàng giao thất bại đã về kho (xem ShippingServiceImpl):
+            // kho đã được cộng lại và đơn đã đóng, chỉ còn hoàn tiền cho khách.
+            boolean returnedGoods = order.getStatus() == OrderStatus.CANCELLED;
+
+            if (!returnedGoods
+                    && !OrderStatusTransition.canTransition(payment.getMethod(), order.getStatus(), OrderStatus.REFUNDED)) {
                 throw new BadRequestException("Cannot refund order with status: " + order.getStatus());
             }
 
-            User admin = userRepository.findById(adminId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + adminId));
+            if (returnedGoods) {
+                payment.setStatus(PaymentStatus.REFUNDED);
+            } else {
+                User admin = userRepository.findById(adminId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Admin not found with id: " + adminId));
 
-            // Hàng chưa rời kho (đơn đang PAID) nên hoàn kho
-            for (OrderItem item : order.getOrderItems()) {
-                productService.restoreStock(item.getProduct().getId(), item.getQuantity());
+                // Hàng chưa rời kho (đơn đang PAID) nên hoàn kho
+                for (OrderItem item : order.getOrderItems()) {
+                    productService.restoreStock(item.getProduct().getId(), item.getQuantity());
+                }
+
+                payment.setStatus(PaymentStatus.REFUNDED);
+
+                orderStatusLogRepository.save(OrderStatusLog.builder()
+                        .order(order)
+                        .oldStatus(order.getStatus())
+                        .newStatus(OrderStatus.REFUNDED)
+                        .changedBy(admin)
+                        .build());
+                order.setStatus(OrderStatus.REFUNDED);
+                orderRepository.save(order);
             }
-
-            payment.setStatus(PaymentStatus.REFUNDED);
-
-            orderStatusLogRepository.save(OrderStatusLog.builder()
-                    .order(order)
-                    .oldStatus(order.getStatus())
-                    .newStatus(OrderStatus.REFUNDED)
-                    .changedBy(admin)
-                    .build());
-            order.setStatus(OrderStatus.REFUNDED);
-            orderRepository.save(order);
         }
 
         refund.setStatus(to);
         return refundMapper.toRefundResponse(refundRepository.save(refund));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminRefundResponse> getRefunds(RefundStatus status, Pageable pageable) {
+        Page<Refund> page = (status == null)
+                ? refundRepository.findAll(pageable)
+                : refundRepository.findByStatus(status, pageable);
+        return page.map(refundMapper::toAdminResponse);
     }
 }

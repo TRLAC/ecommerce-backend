@@ -2,6 +2,8 @@ package com.ecommerce.service.impl;
 
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,6 +82,16 @@ public class UserServiceImpl implements UserService{
 	    User user = userRepository.findByEmail(email)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 
+	    if (request.getEmail() != null && !request.getEmail().isBlank()) {
+	        String newEmail = request.getEmail().trim();
+	        if (!newEmail.equalsIgnoreCase(user.getEmail())) {
+	            if (userRepository.existsByEmail(newEmail)) {
+	                throw new BadRequestException("Email already exists");
+	            }
+	            user.setEmail(newEmail);
+	        }
+	    }
+	    
 	    if (request.getFullName() != null) {
 	        user.setFullName(request.getFullName());
 	    }
@@ -101,5 +113,14 @@ public class UserServiceImpl implements UserService{
 	    User savedUser = userRepository.save(user);
 
 	    return profileMapper.mapToProfile(savedUser);
+	}
+
+	// ADMIN: tìm người dùng theo email hoặc họ tên (keyword rỗng = lấy tất cả)
+	@Transactional(readOnly = true)
+	public Page<ProfileResponse> searchUsers(String keyword, Pageable pageable) {
+		String k = keyword == null ? "" : keyword.trim();
+		return userRepository
+				.findByEmailContainingIgnoreCaseOrFullNameContainingIgnoreCase(k, k, pageable)
+				.map(profileMapper::mapToProfile);
 	}
 }

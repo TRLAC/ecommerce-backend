@@ -39,7 +39,7 @@ import com.ecommerce.repository.OrderStatusLogRepository;
 import com.ecommerce.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceImTest {
+class OrderServiceImplTest {
 
     @Mock OrderStatusLogRepository orderStatusLogRepository;
     @Mock CartRepository cartRepository;

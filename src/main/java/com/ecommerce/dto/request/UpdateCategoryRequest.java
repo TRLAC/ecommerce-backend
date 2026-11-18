@@ -13,4 +13,5 @@ public class UpdateCategoryRequest {
     private String name;
 
     private Long parentId;
+    private Boolean removeParent;
 }

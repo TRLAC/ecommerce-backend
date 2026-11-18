@@ -18,4 +18,5 @@ public interface CategoryService {
     Page<CategoryResponse> getCategories(Pageable pageable, String keyword);
     Page<CategoryResponse> getCategories(Pageable pageable, CategoryFilter filter);
     List<CategoryResponse> getRootCategories();
+    void showCategory(Long id);
 }

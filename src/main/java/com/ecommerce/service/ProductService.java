@@ -11,6 +11,7 @@ import com.ecommerce.dto.request.CreateProductRequest;
 import com.ecommerce.dto.request.UpdateProductRequest;
 import com.ecommerce.dto.response.ProductResponse;
 import com.ecommerce.entity.Product;
+import com.ecommerce.enums.ProductStatus;
 
 public interface ProductService {
     Product findById(Long id);
@@ -23,4 +24,7 @@ public interface ProductService {
     void hideProduct(Long id);
     Page<ProductResponse> getProducts(Pageable pageable, ProductFilter filter);
     ProductResponse getProductById(Long id);
+
+    // ADMIN: lấy cả sản phẩm đã ẩn, lọc theo keyword/status (có thể null)
+    Page<ProductResponse> getAdminProducts(String keyword, ProductStatus status, Pageable pageable);
 }

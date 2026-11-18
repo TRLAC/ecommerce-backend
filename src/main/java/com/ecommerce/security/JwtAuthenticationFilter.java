@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Không có Bearer token → cho qua
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return ;
+            return;
         }
 
         String token = authHeader.substring(7);

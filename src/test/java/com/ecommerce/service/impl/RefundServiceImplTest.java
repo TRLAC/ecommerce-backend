@@ -40,7 +40,7 @@ import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.ProductService;
 
 @ExtendWith(MockitoExtension.class)
-class RefundServiceImTest {
+class RefundServiceImplTest {
 
     @Mock RefundRepository refundRepository;
     @Mock OrderRepository orderRepository;
